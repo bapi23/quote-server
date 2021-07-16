@@ -1,0 +1,5 @@
+ClientTransport->ClientMsgHandler : onMessageReceived(msg)
+ClientMsgHandler->ClientFactory: createClient()
+Client->OrderBookStorage: subscribe()
+
+MarketMessageHandler->OrderBookStorage: onMarketChange(IMarketChange)

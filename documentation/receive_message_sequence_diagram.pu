@@ -1,0 +1,10 @@
+MarketTransport->MarketMessageHandler : onMessageReceived(jsonMsg)
+
+MarketMessageHandler->OrderBookStorage: onMarketChange(IMarketChange)
+
+
+OrderBookStorage -> IMarketChange: updatedIds = updateOrderBooks(std::map<product_id, OrderBook>)
+OrderBookStorage -> IMarketChange: trades = getTrades()
+OrderBookStorage -> Client: if updatedIds: onOrderBook(OrderBook))
+OrderBookStorage -> Client: if trades: onTrade(Trade)
+Client -> ClientTransportLayer: sendMessage(json or protobuf)
