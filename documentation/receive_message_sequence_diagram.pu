@@ -1,4 +1,0 @@
-@startuml
-title new page test
-Alice -> Bob : test
-@enduml
