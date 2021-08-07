@@ -1,0 +1,18 @@
+@startuml "FeedClient class diagram"
+abstract FeedClient
+class CoinbaseFeedClient
+
+class CoinbaseFeedListener
+class CoinbaseFeedMessageHandler
+abstract MessageReceiver
+abstract ProductListener
+
+CoinbaseFeedClient "1" *-- "many" CoinbaseFeedListener : contains
+FeedClient <|-- CoinbaseFeedClient
+MessageReceiver <|-- CoinbaseFeedClient
+MessageReceiver <|-- CoinbaseFeedMessageHandler
+MessageReceiver <|-- CoinbaseFeedListener
+
+CoinbaseFeedListener "1" *-- "1" CoinbaseFeedMessageHandler : contains
+CoinbaseFeedListener "1" *-- "1" ProductListener : contains
+@enduml

@@ -1,0 +1,9 @@
+[submodule "ext/curlpp"]
+	path = ext/curlpp
+	url = https://github.com/jpbarrette/curlpp.git
+[submodule "ext/websocketpp"]
+	path = ext/websocketpp
+	url = git@github.com:zaphoyd/websocketpp.git
+[submodule "ext/json"]
+	path = ext/json
+	url = git@github.com:nlohmann/json.git

@@ -1,0 +1,6 @@
+@startuml "Message Received"
+WebsocketTransport->FeedClient : onMessageReceived(msg)
+FeedClient->CoinbaseFeedListener : onMessageReceived(msg)
+CoinbaseFeedListener->CoinbaseFeedMessageHandler: OnMessageReceiver(msg)
+CoinbaseFeedMessageHandler->ProductChangeListener: OnProductChanged(ProductChange)
+@enduml

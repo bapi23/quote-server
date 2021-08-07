@@ -1,0 +1,16 @@
+@startuml "Market class diagram"
+abstract FeedClient
+class Market
+
+class Product
+class Client
+abstract FeedClient
+abstract OrderBook
+abstract ProductChangeListener
+
+Market "1" o-- "*" Client
+Product "1" o-- "*" Client
+Market "1" o-- "1" FeedClient
+Product "1" o-- "1" OrderBook
+ProductChangeListener <|-- Product
+@enduml

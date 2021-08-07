@@ -12,12 +12,6 @@ using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
 
-class MessageReceiver{
-public:
-    virtual void onMessageReceived(const std::string& message);
-    virtual ~MessageReceiver(){}
-};
-
 class WebsocketTransport{
 public:
     WebsocketTransport(){
@@ -46,8 +40,6 @@ public:
             return;
         }
 
-        // Note that connect here only requests a connection. No network messages are
-        // exchanged until the event loop starts running in the next line.
         m_client.connect(con);
         m_hdl =  con->get_handle();
 
