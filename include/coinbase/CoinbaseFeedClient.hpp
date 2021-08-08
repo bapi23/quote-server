@@ -1,11 +1,12 @@
 #include <vector>
 #include <algorithm>
+#include <nlohmann/json.hpp>
 
 #include "RestTransport.hpp"
 #include "WebsocketTransport.hpp"
-#include "MessageHandler.hpp"
 #include "FeedClient.hpp"
 #include "CoinbaseFeedListener.hpp"
+#include "FeedClient.hpp"
 
 
 auto subscribe_template = json::parse(R"({
@@ -28,29 +29,42 @@ auto unsibscribe_template = json::parse(R"({
 class CoinbaseFeedClient: public FeedClient, MessageReceiver{
 public:
     CoinbaseFeedClient(){
-        feedTransport.subscribe(this);
+        feedTransport.subscribe("coinbaseFeed", this);
         feedTransport.connect("wss://ws-feed.pro.coinbase.com");
     }
 
     ~CoinbaseFeedClient(){
-        feedTransport.unsubscribe(this);
+        feedTransport.unsubscribe("coinbaseFeed");
     }
+
+    void onMessageReceived(const std::string& message){
+
+    }
+
+    // void run(){
+    //     WebsocketTransport transport;
+    //     transport.connect("wss://ws-feed.pro.coinbase.com");
+    //     sleep(1);
+    //     transport.send(subscribe_test.dump());
+    //     while(isRunning){
+    //         sleep(1);
+    //     }
+    // }
 
     void subscribe(const std::string& productId, ProductChangeListener* listener) override{
         auto it = prodIdToListener.find(productId);
         if(it == prodIdToListener.end()){
-            prodIdToListener[productId] = CoinbaseFeedListener(productId, listener);
+            prodIdToListener.emplace(
+                std::make_pair(productId, std::make_unique<CoinbaseFeedListener>(productId, listener)));
         } else {
-            if(*it != listener) {
-                std::cout << "Different listener already registered!"
-            } else {
-                std::cout << "listener already registered";
-            }
+            std::cout << "listener already registered";
         }
+        feedTransport.send(generateSubscribeMessage(productId));
     }
 
-    void unsubscribe(const std::string& productId, ProductChangeListener* listener) override{
-        
+    void unsubscribe(const std::string& productId) override{
+        feedTransport.send(generateUnsubscribeMessage(productId));
+        prodIdToListener.erase(productId);
     }
 
 private:
@@ -66,5 +80,7 @@ private:
         return message.dump();
     }
 
-    std::unordered_map<std::string, CoinbaseFeedListener> prodIdToListener;
+    std::unordered_map<std::string, std::unique_ptr<CoinbaseFeedListener>> prodIdToListener;
+    WebsocketTransport feedTransport;
+    bool isRunning = true;
 };

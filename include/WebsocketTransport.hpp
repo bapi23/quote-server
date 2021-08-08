@@ -1,10 +1,15 @@
-#include <unordered_set>
+#pragma once
+
+#include <unordered_map>
+#include <string>
 
 #include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 #include <websocketpp/common/thread.hpp>
 #include <websocketpp/common/memory.hpp>
 #include <iostream>
+
+#include "MessageReceiver.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_tls_client> websocket_client;
 using websocketpp::lib::placeholders::_1;
@@ -54,12 +59,12 @@ public:
         m_client.send(m_hdl, msg, websocketpp::frame::opcode::text, ec);
     }
 
-    void subscribe(MessageReceiver* receiver){
-        subscribers.insert(receiver);
+    void subscribe(const std::string& id, MessageReceiver* receiver){
+        subscribers[id] = receiver;
     }
 
-    void unsubscribe(MessageReceiver* receiver){
-        subscribers.erase(subscribers);
+    void unsubscribe(const std::string& id){
+        subscribers.erase(id);
     }
 
 private:
@@ -67,8 +72,8 @@ private:
     WebsocketTransport& operator=(const WebsocketTransport& wt) = default;
 
     void on_message(websocketpp::connection_hdl, websocket_client::message_ptr msg) {
-        for(const auto& subscriber: subscribers){
-            subscriber->onMessageReceived(msg->get_payload());
+        for(auto& pair: subscribers){
+            pair.second->onMessageReceived(msg->get_payload());
         }
     }
 
@@ -79,5 +84,5 @@ private:
     websocket_client m_client;
     websocketpp::connection_hdl m_hdl;
     websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_thread;
-    std::unordered_set<MessageReceiver*> subscribers; //TODO Introduce id?
+    std::unordered_map<std::string, MessageReceiver*> subscribers;
 };

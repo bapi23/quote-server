@@ -109,52 +109,20 @@
 //     }
 // }
 
+#include "coinbase/CoinbaseFeedClient.hpp"
 #include "WebsocketTransport.hpp"
-#include "RestTransport.hpp"
-#include <nlohmann/json.hpp>
-
-
-using json = nlohmann::json;
-
-
-auto subscribe_test = json::parse(R"({
-    "type": "subscribe",
-    "product_ids": [
-        "ETH-USD",
-        "ETH-EUR"
-    ],
-    "channels": [
-        "full",
-        "heartbeat",
-        {
-            "name": "ticker",
-            "product_ids": [
-                "ETH-BTC",
-                "ETH-USD"
-            ]
-        }
-    ]
-})");
-
-#include "OrderBookStorage.hpp"
-#include "CoinbaseTransport.hpp"
-#include "CoinBaseMessageHandler.hpp"
 
 int main(int argc, char* argv[]) {
-    // bool done = false;
 
+    CoinbaseFeedClient client();
+    bool done = false;
 
     // auto response = RestTransport::request("https://api.pro.coinbase.com/products/ETH-BTC/book?level=3");
     // WebsocketTransport transport;
     // transport.connect("wss://ws-feed.pro.coinbase.com");
     // sleep(1);
     // transport.send(subscribe_test.dump());
-    // while(!done){
-    //     sleep(1);
-    // }
-    OrderBookStorage storage;
-    CoinbaseTransport transport;
-    CoinbaseMessageHandler msgHandler(&transport);
-    transport.subscribe(msgHandler);
-    msgHandler.
+    while(!done){
+        sleep(1);
+    }
 }
