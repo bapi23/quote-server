@@ -1,10 +1,13 @@
 #pragma once
 
+#include <memory>
 #include <vector>
+
 #include "Client.hpp"
 #include "ProductChangeListener.hpp"
 #include "OrderBook.hpp"
 #include "FeedClient.hpp"
+#include "Client.hpp"
 
 class Product: public ProductChangeListener{
 public:
@@ -13,10 +16,10 @@ Product(const std::string productId): m_productId(productId){
 }
 
 ~Product(){
-    feedClient->unsubscribe(m_productId, this);
+    feedClient->unsubscribe(m_productId);
 }
 
-void onProductChange(ProductChange* pc) override {
+void onProductChange(std::unique_ptr<ProductChange> pc) override {
     std::vector<Trade> trades = pc->getTrades();
     bool bookUpdated = pc->updateOrderBook(m_orderBook);
     if(!trades.empty()){
@@ -43,7 +46,7 @@ void removeClient(const std::string& clientId){
 
 private:
     std::string m_productId;
-    std::unordered_map<std::string, *Client> m_clients;
+    std::unordered_map<std::string, Client*> m_clients;
     OrderBook m_orderBook;
     FeedClient* feedClient;
 };

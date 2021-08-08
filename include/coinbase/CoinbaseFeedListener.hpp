@@ -69,7 +69,7 @@ public:
                 messages = m_messageQueue;
             }
             for(const auto& msg: messages){
-                m_msgHandler.onMessageReceved(msg);
+                m_msgHandler.onMessageReceived(msg);
             }
         }
     }

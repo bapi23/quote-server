@@ -110,11 +110,12 @@
 // }
 
 #include "coinbase/CoinbaseFeedClient.hpp"
-#include "WebsocketTransport.hpp"
+#include "Market.hpp"
 
 int main(int argc, char* argv[]) {
 
-    CoinbaseFeedClient client();
+    std::unique_ptr<CoinbaseFeedClient> feed= std::make_unique<CoinbaseFeedClient>();
+    Market market(feed.get());
     bool done = false;
 
     // auto response = RestTransport::request("https://api.pro.coinbase.com/products/ETH-BTC/book?level=3");
@@ -122,6 +123,7 @@ int main(int argc, char* argv[]) {
     // transport.connect("wss://ws-feed.pro.coinbase.com");
     // sleep(1);
     // transport.send(subscribe_test.dump());
+    market.subscribe("clientId1", "ETH-USD");
     while(!done){
         sleep(1);
     }

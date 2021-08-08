@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include "OrderBook.hpp"
 #include "Trade.hpp"

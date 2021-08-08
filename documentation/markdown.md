@@ -124,7 +124,8 @@ OrderBook message with currently avaialable capacity and price
         {
             "price": 33.4,
             "size": 40.5
-        }
+        },
+        ...
 },
 "ask":{
         {
@@ -134,9 +135,9 @@ OrderBook message with currently avaialable capacity and price
         {
             "price": 30.4,
             "size": 23.5
-        } 
+        },
+        ...
 }
-...
 }
 ```
 

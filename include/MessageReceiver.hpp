@@ -4,6 +4,6 @@
 
 class MessageReceiver{
 public:
-    virtual void onMessageReceived(const std::string& message);
+    virtual void onMessageReceived(const std::string& message) = 0;
     virtual ~MessageReceiver(){}
 };

@@ -38,7 +38,7 @@ public:
     }
 
     void onMessageReceived(const std::string& message){
-
+        //std::cout << "received message" << message;
     }
 
     // void run(){
@@ -59,6 +59,7 @@ public:
         } else {
             std::cout << "listener already registered";
         }
+        std::cout << "Registering listener for prod id: " << productId << std::endl;
         feedTransport.send(generateSubscribeMessage(productId));
     }
 

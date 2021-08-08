@@ -9,6 +9,11 @@
 #include "FeedClient.hpp"
 
 class Market{
+public:
+    Market(FeedClient* feedClient){
+        m_feedClient = feedClient;
+    }
+
     void addClient(const std::string& clientId){
         
     }
@@ -28,7 +33,8 @@ class Market{
     }
 
     void unsubscribe(const std::string& clientId, const std::string& prodId){
-        m_feedClient->unsubscribe(prodId, clientId);
+        // @TODO if no other client which is subscribed on such product:
+        m_feedClient->unsubscribe(prodId);
     }
 
 private:
