@@ -1,7 +1,9 @@
 #pragma once
 
+#include "utils/FloatingP.hpp"
+
 struct Order{
-    int price; 
-    int size;
+    FloatingP price; 
+    FloatingP size;
     std::string order_id;
 };

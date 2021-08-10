@@ -3,8 +3,11 @@
 #include <memory>
 
 #include "ProductChangeListener.hpp"
-#include "ResetProductOrderbookChange.hpp"
-#include "ProductChange.hpp"
+#include "ProductChangeResetOrderbook.hpp"
+#include "ProductChangeOpen.hpp"
+#include "ProductChangeDone.hpp"
+#include "ProductChangeMatch.hpp"
+#include "ProductChangeChange.hpp"
 #include "MessageReceiver.hpp"
 #include "Order.hpp"
 
@@ -16,6 +19,7 @@ public:
 
     }
     void onMessageReceived(const std::string& msg) override{
+        std::cout << "Received message" << msg << std::endl;
         //.. create change
         auto jmsg = json::parse(msg);
         std::unique_ptr<ProductChange> pc;
@@ -24,24 +28,53 @@ public:
             std::vector<Order> bids;
             std::vector<Order> asks;
             for(const auto& order: jmsg["asks"]){
-                const double price = order[0].get<double>();
-                const double size = order[0].get<double>();
+                const std::string price = order[0].get<std::string>();
+                const std::string size = order[0].get<std::string>();
                 const std::string orderId = order[0].get<std::string>();
 
-                asks.push_back(Order{price, size, orderId});
+                asks.push_back(Order{std::stod(price), std::stod(size), orderId});
             }
             for(const auto& order: jmsg["bids"]){
-                const double price = order[0].get<double>();
-                const double size = order[0].get<double>();
+                const std::string price = order[0].get<std::string>();
+                const std::string size = order[0].get<std::string>();
                 const std::string orderId = order[0].get<std::string>();
 
-                bids.push_back(Order{price, size, orderId});
+                bids.push_back(Order{std::stod(price), std::stod(size), orderId});
             }
-            pc = std::make_unique<ResetProductOrderbookChange>(bids, asks);
+            pc = std::make_unique<ProductChangeResetOrderbook>(bids, asks);
+        } else if (jmsg.contains("type")) {
+            if(jmsg["type"].get<std::string>() == "open"){
+                const std::string orderId = jmsg["order_id"].get<std::string>();
+                const std::string price = jmsg["price"].get<std::string>();
+                const std::string size = jmsg["remaining_size"].get<std::string>();
+                const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                pc = std::make_unique<ProductChangeOpen>(orderId, std::stod(price), std::stod(size), side);
+            } else if (jmsg["type"].get<std::string>() == "done") {
+                const std::string orderId = jmsg["order_id"].get<std::string>();
+                const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                pc = std::make_unique<ProductChangeDone>(orderId, side);
+            } else if (jmsg["type"].get<std::string>() == "match") {
+                const std::string makerOrderId = jmsg["maker_order_id"].get<std::string>();
+                const std::string takerOrderId = jmsg["taker_order_id"].get<std::string>();
+                const std::string price = jmsg["price"].get<std::string>();
+                const std::string size = jmsg["size"].get<std::string>();
+                const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                pc = std::make_unique<ProductChangeMatch>(makerOrderId, takerOrderId, std::stod(price), std::stod(size), side);
+            } else if (jmsg["type"].get<std::string>() == "change") {
+                const std::string orderId = jmsg["order_id"].get<std::string>();
+                const std::string price = jmsg["price"].get<std::string>();
+                const std::string size = jmsg["size"].get<std::string>();
+                const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                pc = std::make_unique<ProductChangeChange>(orderId, std::stod(price), std::stod(size), side);
+            } else {
+                std::cout << "Unsupported message type" << jmsg["type"].get<std::string>();
+            }
         } else {
             std::cout << "Can't handle message" << msg;
         }
-        m_listener->onProductChange(std::move(pc));
+        if(pc != nullptr){
+            m_listener->onProductChange(std::move(pc));
+        }
     }
 
 private:

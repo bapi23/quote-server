@@ -21,7 +21,6 @@ public:
 
         ss << request;
         std::string output = ss.str();
-        std::cout << output;
         return output;
     }
     catch ( curlpp::LogicError & e ) {

@@ -111,9 +111,11 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
+#include <chrono>
+#include <thread>
 
 int main(int argc, char* argv[]) {
-
+    using namespace std::chrono_literals;
     std::unique_ptr<CoinbaseFeedClient> feed= std::make_unique<CoinbaseFeedClient>();
     Market market(feed.get());
     bool done = false;
@@ -125,6 +127,6 @@ int main(int argc, char* argv[]) {
     // transport.send(subscribe_test.dump());
     market.subscribe("clientId1", "ETH-USD");
     while(!done){
-        sleep(1);
+        std::this_thread::sleep_for(20ms);
     }
 }

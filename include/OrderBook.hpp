@@ -1,9 +1,13 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 #include <unordered_map>
+#include <iostream>
 
 #include "Order.hpp"
+#include "utils/FloatingP.hpp"
+#include "Side.hpp"
 
 class OrderBook{
 public:
@@ -18,21 +22,89 @@ public:
         }
     }
 
-    bool addOrder(const Order& order){
-
+    void addOrder(const Order& order, Side side){
+        if(side == Side::Buy){
+            m_bids.push_back(order);
+        } else {
+            m_asks.push_back(order);
+        }
     }
 
-    bool removeOrder(const Order& order){
-
+    void removeOrder(const std::string& orderId, Side side){
+        if(side == Side::Buy){
+            auto it = std::find_if(m_asks.begin(), m_asks.end(), 
+                                [&orderId](const Order& o){ return o.order_id == orderId; });
+            if(it != m_asks.end())
+                m_asks.erase(it);
+        } else {
+            auto it = std::find_if(m_bids.begin(), m_bids.end(), 
+                                [&orderId](const Order& o){ return o.order_id == orderId; });
+            if(it != m_bids.end())
+                m_bids.erase(it);
+        }
     }
 
-    bool updateOrder(const Order& order){
+    void updateOrder(const std::string orderId, FloatingP newSize, Side side){
+        if(side == Side::Buy){
+            auto it = std::find_if(m_asks.begin(), m_asks.end(), 
+                                [&orderId](const Order& o){ return o.order_id == orderId; });
+            if(it == m_asks.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << orderId;
+                return;
+            }
+            it->size = newSize;
+        } else {
+            auto it = std::find_if(m_bids.begin(), m_bids.end(), 
+                                [&orderId](const Order& o){ return o.order_id == orderId; });
+            if(it == m_bids.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << orderId;
+                return;
+            }
+            it->size = newSize;
+        }
+    }
+
+    void matchOrders(const std::string& makerOrderId,
+                    const std::string& takerOrderId, 
+                    FloatingP matchedSize,
+                    Side side){
+        if(side == Side::Sell){
+            auto it = std::find_if(m_bids.begin(), m_bids.end(), 
+                    [&makerOrderId](const Order& o){ return o.order_id == makerOrderId; });
+            if(it == m_asks.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << makerOrderId;
+                return;
+            }
+            it->size = it->size - matchedSize;
+
+            auto ita = std::find_if(m_asks.begin(), m_asks.end(), 
+                    [&takerOrderId](const Order& o){ return o.order_id == takerOrderId; });
+            if(ita == m_asks.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << takerOrderId;
+                return;
+            }
+            ita->size = ita->size - matchedSize;
+        } else {
+            auto it = std::find_if(m_asks.begin(), m_asks.end(), 
+                    [&makerOrderId](const Order& o){ return o.order_id == makerOrderId; });
+            if(it == m_asks.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << makerOrderId;
+                return;
+            }
+            it->size = it->size - matchedSize;
+
+            auto itb = std::find_if(m_bids.begin(), m_bids.end(), 
+                    [&takerOrderId](const Order& o){ return o.order_id == takerOrderId; });
+            if(itb == m_bids.end()){
+                std::cout << "Can't update - order doesn't exists! Order id: " << takerOrderId;
+                return;
+            }
+            itb->size = itb->size - matchedSize;
+        }
 
     }
 
 private:
     std::vector<Order> m_bids;
     std::vector<Order> m_asks;
-    std::unordered_map<std::string, Order> m_idToBid;
-    std::unordered_map<std::string, Order> m_idToAsk;
 };

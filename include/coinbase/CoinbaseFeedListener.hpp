@@ -39,7 +39,7 @@ public:
         auto jmessage = json::parse(message);
 
         int sequence = jmessage["sequence"].get<int>();
-        if (sequence != 0){
+        if (m_lastSequenceNumber != 0){
             if( sequence > m_lastSequenceNumber+1){
                 // we have a gap between sequence numbers - reinitializing everything:
                 m_lastSequenceNumber = 0;
@@ -48,7 +48,6 @@ public:
                     m_messageQueue.push_back(message);
                 }
                 requestFullOrderbook();
-                return;
             }
         }
         

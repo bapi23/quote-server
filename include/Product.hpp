@@ -20,11 +20,11 @@ Product(const std::string productId): m_productId(productId){
 }
 
 void onProductChange(std::unique_ptr<ProductChange> pc) override {
-    std::vector<Trade> trades = pc->getTrades();
+    std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     bool bookUpdated = pc->updateOrderBook(m_orderBook);
     if(!trades.empty()){
         for(auto& client: m_clients){
-            //@TODO id fw would receive client id this algorithm might be improved by sending changes only to apropriate clients (not to all)
+            //@TODO if would receive client id this algorithm might be improved by sending changes only to apropriate clients (not to all)
             //client.onTrade(trade)
         }
     }

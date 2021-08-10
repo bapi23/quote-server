@@ -8,7 +8,6 @@
 #include "CoinbaseFeedListener.hpp"
 #include "FeedClient.hpp"
 
-
 auto subscribe_template = json::parse(R"({
     "type": "subscribe",
     "product_ids": [],
@@ -38,7 +37,17 @@ public:
     }
 
     void onMessageReceived(const std::string& message){
-        //std::cout << "received message" << message;
+        auto jmsg = json::parse(message);
+        if(jmsg.contains("product_id")){
+            auto prodId = jmsg["product_id"].get<std::string>();
+            auto it = prodIdToListener.find(prodId);
+            if(it == prodIdToListener.end()){
+                std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
+            }
+            it->second->onMessageReceived(message);
+        }
+
+        std::cout << "received message" << message;
     }
 
     // void run(){
