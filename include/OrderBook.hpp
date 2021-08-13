@@ -22,6 +22,10 @@ public:
         }
     }
 
+    std::string generateMessage(){
+        return "{'orderbook':{}}";
+    }
+
     void addOrder(const Order& order, Side side){
         if(side == Side::Buy){
             m_bids.push_back(order);
@@ -49,7 +53,7 @@ public:
             auto it = std::find_if(m_asks.begin(), m_asks.end(), 
                                 [&orderId](const Order& o){ return o.order_id == orderId; });
             if(it == m_asks.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << orderId;
+                std::cout << "Can't update - order doesn't exists! Order id: " << orderId << std::endl;
                 return;
             }
             it->size = newSize;
@@ -57,7 +61,7 @@ public:
             auto it = std::find_if(m_bids.begin(), m_bids.end(), 
                                 [&orderId](const Order& o){ return o.order_id == orderId; });
             if(it == m_bids.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << orderId;
+                std::cout << "Can't update - order doesn't exists! Order id: " << orderId << std::endl;
                 return;
             }
             it->size = newSize;
@@ -72,7 +76,7 @@ public:
             auto it = std::find_if(m_bids.begin(), m_bids.end(), 
                     [&makerOrderId](const Order& o){ return o.order_id == makerOrderId; });
             if(it == m_asks.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << makerOrderId;
+                std::cout << "Can't update - matched order doesn't exists! Order id: " << makerOrderId << std::endl;
                 return;
             }
             it->size = it->size - matchedSize;
@@ -80,7 +84,7 @@ public:
             auto ita = std::find_if(m_asks.begin(), m_asks.end(), 
                     [&takerOrderId](const Order& o){ return o.order_id == takerOrderId; });
             if(ita == m_asks.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << takerOrderId;
+                std::cout << "Can't update - matched order doesn't exists! Order id: " << takerOrderId << std::endl;
                 return;
             }
             ita->size = ita->size - matchedSize;
@@ -88,7 +92,7 @@ public:
             auto it = std::find_if(m_asks.begin(), m_asks.end(), 
                     [&makerOrderId](const Order& o){ return o.order_id == makerOrderId; });
             if(it == m_asks.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << makerOrderId;
+                std::cout << "Can't update - matched order doesn't exists! Order id: " << makerOrderId << std::endl;
                 return;
             }
             it->size = it->size - matchedSize;
@@ -96,7 +100,7 @@ public:
             auto itb = std::find_if(m_bids.begin(), m_bids.end(), 
                     [&takerOrderId](const Order& o){ return o.order_id == takerOrderId; });
             if(itb == m_bids.end()){
-                std::cout << "Can't update - order doesn't exists! Order id: " << takerOrderId;
+                std::cout << "Can't update - meched order doesn't exists! Order id: " << takerOrderId << std::endl;
                 return;
             }
             itb->size = itb->size - matchedSize;

@@ -7,15 +7,15 @@
 #include "Product.hpp"
 #include "Client.hpp"
 #include "FeedClient.hpp"
+#include "ProductChangePublisherFactory.hpp"
 
 class Market{
 public:
-    Market(FeedClient* feedClient){
-        m_feedClient = feedClient;
-    }
-
-    void addClient(const std::string& clientId){
-        
+    Market(std::unique_ptr<FeedClient> feedClient, 
+           std::unique_ptr<ProductChangePublisherFactory> publisherFactory):
+        m_feedClient(std::move(feedClient)),
+        m_publisherFactory(std::move(publisherFactory))
+    {
     }
 
     void subscribe(const std::string& clientId, const std::string& prodId){
@@ -26,7 +26,7 @@ public:
 
         auto prodIt = m_products.find(prodId);
         if(prodIt == m_products.end()){
-            m_products.insert({prodId, new Product(prodId)});
+            m_products.insert({prodId, new Product(prodId, m_publisherFactory->createPublisher(prodId))});
         }
 
         m_feedClient->subscribe(prodId, m_products[prodId]);
@@ -40,5 +40,6 @@ public:
 private:
     std::unordered_map<std::string, Product*> m_products;
     std::unordered_map<std::string, Client*> m_clients;
-    FeedClient* m_feedClient;
+    std::unique_ptr<FeedClient> m_feedClient;
+    std::unique_ptr<ProductChangePublisherFactory> m_publisherFactory;
 };

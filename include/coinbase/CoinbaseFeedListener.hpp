@@ -22,13 +22,15 @@ public:
     }
 
     void requestFullOrderbook(){
+        std::cout << "Requesting full orderbook" << std::endl;
         std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderbookImpl, this)).detach();
     }
 
     void requestFullOrderbookImpl(){
         std::string request = "https://api.pro.coinbase.com/products/" + m_productId + "/book?level=3";
         auto initialMessage = RestTransport::request(request);
-        {
+
+        if(!initialMessage.empty()){
             std::lock_guard<std::mutex> lg(m_messagesMutex);
             m_messageQueue.push_front(initialMessage);
         }

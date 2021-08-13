@@ -37,17 +37,21 @@ public:
     }
 
     void onMessageReceived(const std::string& message){
-        auto jmsg = json::parse(message);
-        if(jmsg.contains("product_id")){
-            auto prodId = jmsg["product_id"].get<std::string>();
-            auto it = prodIdToListener.find(prodId);
-            if(it == prodIdToListener.end()){
-                std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
+        try{
+            auto jmsg = json::parse(message);
+            if(jmsg.contains("product_id")){
+                auto prodId = jmsg["product_id"].get<std::string>();
+                auto it = prodIdToListener.find(prodId);
+                if(it == prodIdToListener.end()){
+                    std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
+                }
+                it->second->onMessageReceived(message);
             }
-            it->second->onMessageReceived(message);
+
+        } catch(nlohmann::detail::parse_error){
+            std::cout << "Can't parse message: " << message;
         }
 
-        std::cout << "received message" << message;
     }
 
     // void run(){

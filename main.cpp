@@ -111,13 +111,15 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
+#include "ProductChangePublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
 
 int main(int argc, char* argv[]) {
     using namespace std::chrono_literals;
-    std::unique_ptr<CoinbaseFeedClient> feed= std::make_unique<CoinbaseFeedClient>();
-    Market market(feed.get());
+    auto feed = std::make_unique<CoinbaseFeedClient>();
+    std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
+    Market market(std::move(feed), std::move(publisherFactory));
     bool done = false;
 
     // auto response = RestTransport::request("https://api.pro.coinbase.com/products/ETH-BTC/book?level=3");

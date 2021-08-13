@@ -72,7 +72,6 @@ private:
     WebsocketTransport& operator=(const WebsocketTransport& wt) = default;
 
     void on_message(websocketpp::connection_hdl, websocket_client::message_ptr msg) {
-        std::cout << "websocket received message" << msg->get_payload() << std::endl;
         for(auto& pair: subscribers){
             pair.second->onMessageReceived(msg->get_payload());
         }

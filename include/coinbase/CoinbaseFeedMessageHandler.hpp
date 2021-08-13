@@ -19,12 +19,12 @@ public:
 
     }
     void onMessageReceived(const std::string& msg) override{
-        std::cout << "Received message" << msg << std::endl;
         //.. create change
         auto jmsg = json::parse(msg);
         std::unique_ptr<ProductChange> pc;
     
         if(jmsg.contains("bids") && jmsg.contains("asks")){
+            std::cout << "Received full orderbook message" << std::endl;
             std::vector<Order> bids;
             std::vector<Order> asks;
             for(const auto& order: jmsg["asks"]){
@@ -48,10 +48,13 @@ public:
                 const std::string price = jmsg["price"].get<std::string>();
                 const std::string size = jmsg["remaining_size"].get<std::string>();
                 const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
                 pc = std::make_unique<ProductChangeOpen>(orderId, std::stod(price), std::stod(size), side);
             } else if (jmsg["type"].get<std::string>() == "done") {
+                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << jmsg["order_id"].get<std::string>() << std::endl;
                 const std::string orderId = jmsg["order_id"].get<std::string>();
                 const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
                 pc = std::make_unique<ProductChangeDone>(orderId, side);
             } else if (jmsg["type"].get<std::string>() == "match") {
                 const std::string makerOrderId = jmsg["maker_order_id"].get<std::string>();
@@ -59,15 +62,18 @@ public:
                 const std::string price = jmsg["price"].get<std::string>();
                 const std::string size = jmsg["size"].get<std::string>();
                 const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " maker id: " << makerOrderId << " taker id: " << takerOrderId <<std::endl;
                 pc = std::make_unique<ProductChangeMatch>(makerOrderId, takerOrderId, std::stod(price), std::stod(size), side);
+
             } else if (jmsg["type"].get<std::string>() == "change") {
                 const std::string orderId = jmsg["order_id"].get<std::string>();
                 const std::string price = jmsg["price"].get<std::string>();
                 const std::string size = jmsg["size"].get<std::string>();
                 const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
+                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
                 pc = std::make_unique<ProductChangeChange>(orderId, std::stod(price), std::stod(size), side);
             } else {
-                std::cout << "Unsupported message type" << jmsg["type"].get<std::string>();
+                //std::cout << "Unsupported message type: " << jmsg["type"].get<std::string>() << std::endl;
             }
         } else {
             std::cout << "Can't handle message" << msg;
