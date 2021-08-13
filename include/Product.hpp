@@ -28,9 +28,9 @@ void onProductChange(std::unique_ptr<ProductChange> pc) override {
     std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
     if(!trades.empty()){
-        for(const auto& trade: trades){
+        for(auto& trade: trades){
             std::cout << "Publishing trade" << std::endl;
-            m_publisher->publish(trade->generateMessage());
+            m_publisher->publish(std::move(trade));
         }
     }
     if(bookUpdated){

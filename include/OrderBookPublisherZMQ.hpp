@@ -21,11 +21,18 @@ public:
             m_sock.bind("tcp://*:" + transport::prodIdToPort[productId]);
         }
 
-    void publish(const OrderBookView* view){
+    void publish(OrderBookView* view){
         nlohmann::json jmessage;
-        jmessage["asks"] = view->getAsks();
-        jmessage["bids"] = view->getAsks();
+        jmessage["asks"] = nlohmann::json::parse(view->getAsks());
+        jmessage["bids"] = nlohmann::json::parse(view->getAsks());
         std::string payload = jmessage.dump();
+        zmq::message_t message(payload.size());
+        memcpy (message.data(), payload.data(), payload.size());
+        m_sock.send(message, zmq::send_flags::none);
+    }
+
+    void publish(std::unique_ptr<Trade> trade){
+        std::string payload = trade->generateMessage();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
         m_sock.send(message, zmq::send_flags::none);

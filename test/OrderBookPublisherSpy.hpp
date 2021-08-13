@@ -5,7 +5,7 @@
 class OrderBookPublisherSpy: public OrderBookPublisher
 {
 public:
-    void publish(const std::string data) override {
+    void publish(OrderBookView* view) override {
         messages.push_back(data);
     }
 
