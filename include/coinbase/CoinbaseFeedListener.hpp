@@ -18,15 +18,15 @@ public:
         m_lastSequenceNumber(0)
     {
         std::thread(std::bind(&CoinbaseFeedListener::notifyHandler, this)).detach();
-        requestFullOrderbook();
+        requestFullOrderBook();
     }
 
-    void requestFullOrderbook(){
+    void requestFullOrderBook(){
         std::cout << "Requesting full orderbook" << std::endl;
-        std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderbookImpl, this)).detach();
+        std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)).detach();
     }
 
-    void requestFullOrderbookImpl(){
+    void requestFullOrderBookImpl(){
         std::string request = "https://api.pro.coinbase.com/products/" + m_productId + "/book?level=3";
         auto initialMessage = RestTransport::request(request);
 
@@ -49,7 +49,7 @@ public:
                     std::unique_lock<std::mutex> lk(m_messagesMutex);
                     m_messageQueue.push_back(message);
                 }
-                requestFullOrderbook();
+                requestFullOrderBook();
             }
         }
         

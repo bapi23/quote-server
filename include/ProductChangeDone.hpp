@@ -32,8 +32,8 @@ public:
         return vec;
     }
 
-    bool updateOrderBook(OrderBook& orderBook) const override{
-        orderBook.removeOrder(m_orderId, m_side);
+    bool updateOrderBook(OrderBook* orderBook) const override{
+        orderBook->removeOrder(m_orderId, m_side);
         return true;
     }
 

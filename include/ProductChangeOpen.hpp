@@ -28,8 +28,8 @@ public:
         return std::vector<std::unique_ptr<Trade>>();
     }
 
-    bool updateOrderBook(OrderBook& orderBook) const override{
-        orderBook.addOrder(Order{m_price, m_remainingSize, m_orderId}, m_side);
+    bool updateOrderBook(OrderBook* orderBook) const override{
+        orderBook->addOrder(Order{m_price, m_remainingSize, m_orderId}, m_side);
         return true;
     }
 

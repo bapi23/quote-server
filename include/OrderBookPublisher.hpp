@@ -7,10 +7,11 @@
 #include <atomic>
 
 #include "ProductIdConnectionTable.hpp"
+#include "OrderBookView.hpp"
 
-class ProductChangePublisher
+class OrderBookPublisher
 {
 public:
-    virtual void publish(const std::string data) = 0;
-    virtual ~ProductChangePublisher(){};
+    virtual void publish(const OrderBookView& view) = 0;
+    virtual ~OrderBookPublisher(){};
 };

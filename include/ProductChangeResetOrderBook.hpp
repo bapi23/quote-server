@@ -1,8 +1,9 @@
+#pragma once
 #include "Product.hpp"
 
-class ProductChangeResetOrderbook: public ProductChange{
+class ProductChangeResetOrderBook: public ProductChange{
 public:
-    ProductChangeResetOrderbook(const std::vector<Order>& bids, const std::vector<Order>& asks):
+    ProductChangeResetOrderBook(const std::vector<Order>& bids, const std::vector<Order>& asks):
         m_bids(bids),
         m_asks(asks)
     {
@@ -12,8 +13,8 @@ public:
         return std::vector<std::unique_ptr<Trade>>();
     }
 
-    bool updateOrderBook(OrderBook& orderBook) const override{
-        orderBook.init(m_bids, m_asks);
+    bool updateOrderBook(OrderBook* orderBook) const override{
+        orderBook->init(m_bids, m_asks);
         return true;
     }
 

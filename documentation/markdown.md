@@ -70,7 +70,7 @@ ProductChangeListener <|-- Product
 ```
 
 ##### Client registration
-Client needs to get clientId to be able to subscribe and receive Orderbook and Trade messages
+Client needs to get clientId to be able to subscribe and receive OrderBook and Trade messages
 ```plantuml
 @startuml "Client registration"
 ClientTransport->ClientServer: register()

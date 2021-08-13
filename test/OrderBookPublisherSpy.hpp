@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ProductChangePublisher.hpp"
+#include "OrderBookPublisher.hpp"
 
-class ProductChangePublisherSpy: public ProductChangePublisher
+class OrderBookPublisherSpy: public OrderBookPublisher
 {
 public:
     void publish(const std::string data) override {

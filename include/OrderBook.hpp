@@ -8,8 +8,9 @@
 #include "Order.hpp"
 #include "utils/FloatingP.hpp"
 #include "Side.hpp"
+#include "OrderBookView.hpp"
 
-class OrderBook{
+class OrderBook: public OrderBookView{
 public:
     void init(std::vector<Order> bids, std::vector<Order> asks){
         m_bids.clear();
@@ -20,10 +21,6 @@ public:
         for(const auto& ask: asks){
             m_asks.push_back(ask);
         }
-    }
-
-    std::string generateMessage(){
-        return "{'orderbook':{}}";
     }
 
     void addOrder(const Order& order, Side side){
@@ -105,7 +102,15 @@ public:
             }
             itb->size = itb->size - matchedSize;
         }
+    }
 
+    //OrderBookView interface
+    const std::vector<Order>& getAsks() const override{
+        return m_asks;
+    }
+    
+    const std::vector<Order>& getBids() const override{
+        return m_bids;
     }
 
 private:

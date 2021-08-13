@@ -7,12 +7,12 @@
 #include "Product.hpp"
 #include "Client.hpp"
 #include "FeedClient.hpp"
-#include "ProductChangePublisherFactory.hpp"
+#include "OrderBookPublisherFactory.hpp"
 
 class Market{
 public:
     Market(std::unique_ptr<FeedClient> feedClient, 
-           std::unique_ptr<ProductChangePublisherFactory> publisherFactory):
+           std::unique_ptr<OrderBookPublisherFactory> publisherFactory):
         m_feedClient(std::move(feedClient)),
         m_publisherFactory(std::move(publisherFactory))
     {
@@ -41,5 +41,5 @@ private:
     std::unordered_map<std::string, Product*> m_products;
     std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<FeedClient> m_feedClient;
-    std::unique_ptr<ProductChangePublisherFactory> m_publisherFactory;
+    std::unique_ptr<OrderBookPublisherFactory> m_publisherFactory;
 };

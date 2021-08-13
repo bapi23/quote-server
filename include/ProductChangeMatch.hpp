@@ -39,8 +39,8 @@ public:
         return vec;
     }
 
-    bool updateOrderBook(OrderBook& orderBook) const override{
-        orderBook.matchOrders(m_makerOrderId, m_takerOrderId, m_size, m_side);
+    bool updateOrderBook(OrderBook* orderBook) const override{
+        orderBook->matchOrders(m_makerOrderId, m_takerOrderId, m_size, m_side);
         return true;
     }
 

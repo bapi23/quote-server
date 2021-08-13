@@ -5,12 +5,14 @@
 #include <atomic>
 
 #include "ProductIdConnectionTable.hpp"
-#include "ProductChangePublisher.hpp"
+#include "OrderBookPublisher.hpp"
 
-class ProductChangePublisherZMQ: public ProductChangePublisher
+using json = nlohmann::json;
+
+class OrderBookPublisherZMQ: public OrderBookPublisher
 {
 public:
-    ProductChangePublisherZMQ(const std::string& productId):
+    OrderBookPublisherZMQ(const std::string& productId):
         m_ctx(),
         m_sock(m_ctx, zmq::socket_type::pub)
         {
@@ -19,9 +21,13 @@ public:
             m_sock.bind("tcp://*:" + transport::prodIdToPort[productId]);
         }
 
-    void publish(const std::string data){
-        zmq::message_t message(data.size());
-        memcpy (message.data(), data.data(), data.size());
+    void publish(const OrderBookView* view){
+        nlohmann::json jmessage;
+        jmessage["asks"] = view->getAsks();
+        jmessage["bids"] = view->getAsks();
+        std::string payload = jmessage.dump();
+        zmq::message_t message(payload.size());
+        memcpy (message.data(), payload.data(), payload.size());
         m_sock.send(message, zmq::send_flags::none);
     }
 

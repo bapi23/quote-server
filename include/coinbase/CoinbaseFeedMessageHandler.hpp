@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "ProductChangeListener.hpp"
-#include "ProductChangeResetOrderbook.hpp"
+#include "ProductChangeResetOrderBook.hpp"
 #include "ProductChangeOpen.hpp"
 #include "ProductChangeDone.hpp"
 #include "ProductChangeMatch.hpp"
@@ -41,7 +41,7 @@ public:
 
                 bids.push_back(Order{std::stod(price), std::stod(size), orderId});
             }
-            pc = std::make_unique<ProductChangeResetOrderbook>(bids, asks);
+            pc = std::make_unique<ProductChangeResetOrderBook>(bids, asks);
         } else if (jmsg.contains("type")) {
             if(jmsg["type"].get<std::string>() == "open"){
                 const std::string orderId = jmsg["order_id"].get<std::string>();

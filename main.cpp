@@ -111,14 +111,14 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
-#include "ProductChangePublisherFactoryZMQ.hpp"
+#include "OrderBookPublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
 
 int main(int argc, char* argv[]) {
     using namespace std::chrono_literals;
     auto feed = std::make_unique<CoinbaseFeedClient>();
-    std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
+    std::unique_ptr<OrderBookPublisherFactory> publisherFactory = std::make_unique<OrderBookPublisherFactoryZMQ>();
     Market market(std::move(feed), std::move(publisherFactory));
     bool done = false;
 
