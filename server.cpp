@@ -111,15 +111,18 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
-#include "OrderBookPublisherFactoryZMQ.hpp"
+#include "ClientRegister.hpp"
+#include "ProductChangePublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
 
 int main(int argc, char* argv[]) {
     using namespace std::chrono_literals;
     auto feed = std::make_unique<CoinbaseFeedClient>();
-    std::unique_ptr<OrderBookPublisherFactory> publisherFactory = std::make_unique<OrderBookPublisherFactoryZMQ>();
-    Market market(std::move(feed), std::move(publisherFactory));
+    std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
+    std::unique_ptr<Market> market = std::make_unique<Market>(std::move(feed), std::move(publisherFactory));
+    ClientRegister clientReg(market.get(), "127.0.0.1");
+    clientReg.run();
     bool done = false;
 
     // auto response = RestTransport::request("https://api.pro.coinbase.com/products/ETH-BTC/book?level=3");
@@ -127,7 +130,7 @@ int main(int argc, char* argv[]) {
     // transport.connect("wss://ws-feed.pro.coinbase.com");
     // sleep(1);
     // transport.send(subscribe_test.dump());
-    market.subscribe("clientId1", "ETH-USD");
+    //market.subscribe("clientId1", "ETH-USD");
     while(!done){
         std::this_thread::sleep_for(20ms);
     }

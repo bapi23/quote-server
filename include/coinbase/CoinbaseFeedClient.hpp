@@ -27,10 +27,6 @@ auto unsibscribe_template = json::parse(R"({
 
 class CoinbaseFeedClient: public FeedClient, MessageReceiver{
 public:
-    CoinbaseFeedClient(){
-        feedTransport.subscribe("coinbaseFeed", this);
-        feedTransport.connect("wss://ws-feed.pro.coinbase.com");
-    }
 
     ~CoinbaseFeedClient(){
         feedTransport.unsubscribe("coinbaseFeed");
@@ -46,6 +42,8 @@ public:
                     std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
                 }
                 it->second->onMessageReceived(message);
+            } else if(jmsg.contains("type") && jmsg["type"].contains("subscriptions")){
+                //@TODO received subscription message!
             }
 
         } catch(nlohmann::detail::parse_error){
@@ -54,17 +52,13 @@ public:
 
     }
 
-    // void run(){
-    //     WebsocketTransport transport;
-    //     transport.connect("wss://ws-feed.pro.coinbase.com");
-    //     sleep(1);
-    //     transport.send(subscribe_test.dump());
-    //     while(isRunning){
-    //         sleep(1);
-    //     }
-    // }
-
     void subscribe(const std::string& productId, ProductChangeListener* listener) override{
+        if(!m_connected){
+            feedTransport.subscribe("coinbaseFeed", this);
+            feedTransport.connect("wss://ws-feed.pro.coinbase.com");
+            m_connected = true;
+            
+        }
         auto it = prodIdToListener.find(productId);
         if(it == prodIdToListener.end()){
             prodIdToListener.emplace(
@@ -96,5 +90,5 @@ private:
 
     std::unordered_map<std::string, std::unique_ptr<CoinbaseFeedListener>> prodIdToListener;
     WebsocketTransport feedTransport;
-    bool isRunning = true;
+    bool m_connected = false;
 };

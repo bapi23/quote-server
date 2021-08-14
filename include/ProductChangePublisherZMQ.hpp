@@ -5,14 +5,24 @@
 #include <atomic>
 
 #include "ProductIdConnectionTable.hpp"
-#include "OrderBookPublisher.hpp"
+#include "ProductChangePublisher.hpp"
 
 using json = nlohmann::json;
 
-class OrderBookPublisherZMQ: public OrderBookPublisher
+void to_json(nlohmann::json& j, const Order& o) {
+    j = json{{"order_id", o.order_id}, {"size", o.size}, {"price", o.price}};
+}
+
+void from_json(const json& j, Order& o) {
+    j.at("order_id").get_to(o.order_id);
+    j.at("size").get_to(o.size);
+    j.at("price").get_to(o.price);
+}
+
+class ProductChangePublisherZMQ: public ProductChangePublisher
 {
 public:
-    OrderBookPublisherZMQ(const std::string& productId):
+    ProductChangePublisherZMQ(const std::string& productId):
         m_ctx(),
         m_sock(m_ctx, zmq::socket_type::pub)
         {
@@ -23,8 +33,15 @@ public:
 
     void publish(OrderBookView* view){
         nlohmann::json jmessage;
-        jmessage["asks"] = nlohmann::json::parse(view->getAsks());
-        jmessage["bids"] = nlohmann::json::parse(view->getAsks());
+        nlohmann::json test = view->getAsks()[0];
+        
+        for(const auto& order: view->getAsks()){
+            jmessage["asks"].push_back(order);
+        }
+        
+        for(const auto& order: view->getBids()){
+            jmessage["bids"].push_back(order);
+        }
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());

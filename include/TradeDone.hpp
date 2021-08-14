@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <nlohmann/json.hpp>
 
 #include "Trade.hpp"
 #include "utils/FloatingP.hpp"
@@ -11,11 +12,17 @@ public:
     {}
 
     std::string orderId() override {
-        return "";
+        return m_orderId;
     }
 
     std::string generateMessage() override {
-        return "{}";
+        nlohmann::json jmessage =
+        {"trade", {
+                {"type", "done"},
+                {"order_id", m_orderId}
+            }
+        };
+        return jmessage.dump();
     }
 
     std::string m_orderId;

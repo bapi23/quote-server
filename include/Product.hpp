@@ -5,7 +5,7 @@
 
 #include "Client.hpp"
 #include "ProductChangeListener.hpp"
-#include "OrderBookPublisher.hpp"
+#include "ProductChangePublisher.hpp"
 #include "OrderBook.hpp"
 #include "FeedClient.hpp"
 #include "Client.hpp"
@@ -13,7 +13,7 @@
 class Product: public ProductChangeListener{
 public:
 Product(const std::string productId, 
-        std::unique_ptr<OrderBookPublisher> publisher): 
+        std::unique_ptr<ProductChangePublisher> publisher): 
     m_productId(productId), 
     m_publisher(std::move(publisher)),
     m_orderBook(std::make_unique<OrderBook>()){
@@ -56,5 +56,5 @@ private:
     std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<OrderBook> m_orderBook;
     FeedClient* feedClient;
-    std::unique_ptr<OrderBookPublisher> m_publisher;
+    std::unique_ptr<ProductChangePublisher> m_publisher;
 };

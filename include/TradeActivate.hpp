@@ -3,17 +3,33 @@
 
 #include "Trade.hpp"
 
-class TradeChange: public Trade{
+class TradeActivate: public Trade{
 public:
-    TradeChange(){
-
+    TradeActivate(const std::string& orderId, FloatingP size, FloatingP price):
+        m_orderId(orderId),
+        m_size(size),
+        m_price(price)
+    {
     }
 
     std::string orderId(){
-        return "";
+        return m_orderId;
     }
     
     virtual std::string generateMessage(){
-        return "{}";
+        nlohmann::json jmessage =
+        {"activate", {
+                {"type", "activate"},
+                {"order_id", m_orderId},
+                {"size", m_size},
+                {"price", m_price}
+            }
+        };
+        return jmessage.dump();
     }
+
+    private:
+    std::string m_orderId;
+    FloatingP m_size;
+    FloatingP m_price;
 };

@@ -17,7 +17,14 @@ public:
     }
 
     std::string generateMessage(){
-        return "{}";
+        nlohmann::json jmessage =
+        {"trade", {
+                {"type", "match"},
+                {"order_id", m_orderId},
+                {"new_size", m_size}
+            }
+        };
+        return jmessage.dump();
     }
 
 private:
