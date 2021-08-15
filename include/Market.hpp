@@ -29,7 +29,7 @@ public:
 
         auto prodIt = m_products.find(prodId);
         if(prodIt == m_products.end()){
-            m_products.insert({prodId, new Product(prodId, m_publisherFactory->createPublisher(prodId))});
+            m_products.insert({prodId, std::make_shared<Product>(prodId, m_publisherFactory->createPublisher(prodId), m_feedClient.get())});
         }
 
         m_feedClient->subscribe(prodId, m_products[prodId]);
@@ -44,15 +44,15 @@ public:
         if(!it->second->hasClients())
         {
             std::cout << "No more clients for " << prodId << " unsubscribing";
+            m_products.erase(prodId);
             m_feedClient->unsubscribe(prodId);
         }
     }
 
 private:
-    std::unordered_map<std::string, Product*> m_products;
-    std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<FeedClient> m_feedClient;
+    std::unordered_map<std::string, std::shared_ptr<Product>> m_products;
+    std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<ProductChangePublisherFactory> m_publisherFactory;
-
     std::mutex marketDataMutex;
 };

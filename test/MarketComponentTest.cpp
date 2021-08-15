@@ -41,7 +41,7 @@ TEST_CASE("ProductShouldPublishFullOrderbook", "MarketTest") {
     std::vector<Order> asks = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     auto prodChangReq = 
         std::make_unique<ProductChangeResetOrderBook>(bids, asks);
-    feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
+    feedPtr->m_listeners["ETH-USD"].lock()->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_asks.size() == 2);
     REQUIRE(publisherFactoryPtr->pubPtr->m_bids.size() == 2);
@@ -62,8 +62,9 @@ TEST_CASE("ProductShouldPublishTrade", "MarketTest") {
 
     auto prodChangReq = 
         std::make_unique<ProductChangeDone>("order_id", Side::Buy);
-    feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
+    feedPtr->m_listeners["ETH-USD"].lock()->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_trades.size() == 1);
 
-    REQUIRE(publisherFactoryPtr->pubPtr->m_trades[0]->generateMessage() == "{}");}
+    REQUIRE(publisherFactoryPtr->pubPtr->m_trades[0]->generateMessage() != "");
+}

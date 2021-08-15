@@ -17,12 +17,11 @@ public:
     }
 
     std::string generateMessage(){
-        nlohmann::json jmessage =
-        {"trade", {
-                {"type", "match"},
-                {"order_id", m_orderId},
-                {"new_size", m_size}
-            }
+        nlohmann::json jmessage = {
+            {"message", "trade"},
+            {"type", "match"},
+            {"order_id", m_orderId},
+            {"new_size", m_size}
         };
         return jmessage.dump();
     }

@@ -16,11 +16,10 @@ public:
     }
 
     std::string generateMessage() override {
-        nlohmann::json jmessage =
-        {"trade", {
-                {"type", "done"},
-                {"order_id", m_orderId}
-            }
+        nlohmann::json jmessage ={
+            {"message", "trade"},
+            {"type", "done"},
+            {"order_id", m_orderId}
         };
         return jmessage.dump();
     }

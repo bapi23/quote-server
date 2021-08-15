@@ -40,8 +40,9 @@ public:
                 auto it = prodIdToListener.find(prodId);
                 if(it == prodIdToListener.end()){
                     std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
+                } else {
+                    it->second->onMessageReceived(message);
                 }
-                it->second->onMessageReceived(message);
             } else if(jmsg.contains("type") && jmsg["type"].contains("subscriptions")){
                 //@TODO received subscription message!
             }
@@ -52,7 +53,7 @@ public:
 
     }
 
-    void subscribe(const std::string& productId, ProductChangeListener* listener) override{
+    void subscribe(const std::string& productId, std::weak_ptr<ProductChangeListener> listener) override{
         if(!m_connected){
             feedTransport.subscribe("coinbaseFeed", this);
             feedTransport.connect("wss://ws-feed.pro.coinbase.com");

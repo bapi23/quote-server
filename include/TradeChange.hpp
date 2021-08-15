@@ -16,12 +16,11 @@ public:
     }
     
     virtual std::string generateMessage(){
-        nlohmann::json jmessage =
-        {"trade", {
-                {"type", "change"},
-                {"order_id", m_orderId},
-                {"new_size", newSize}
-            }
+        nlohmann::json jmessage = {
+            {"message", "trade"},
+            {"type", "change"},
+            {"order_id", m_orderId},
+            {"new_size", newSize}
         };
         return jmessage.dump();
     }

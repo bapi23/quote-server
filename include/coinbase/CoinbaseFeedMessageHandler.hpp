@@ -15,7 +15,7 @@ using json = nlohmann::json;
 
 class CoinbaseFeedMessageHandler: public MessageReceiver{
 public:
-    CoinbaseFeedMessageHandler(ProductChangeListener* listener):m_listener(listener){
+    CoinbaseFeedMessageHandler(std::weak_ptr<ProductChangeListener> listener):m_listener(listener){
 
     }
     void onMessageReceived(const std::string& msg) override{
@@ -79,10 +79,15 @@ public:
             std::cout << "Can't handle message" << msg;
         }
         if(pc != nullptr){
-            m_listener->onProductChange(std::move(pc));
+            auto shared = m_listener.lock();
+            assert(shared);
+            if(shared)
+                shared->onProductChange(std::move(pc));
+            else
+                std::cout << "Listener doesn't exists!";
         }
     }
 
 private:
-    ProductChangeListener* m_listener;
+    std::weak_ptr<ProductChangeListener> m_listener;
 };

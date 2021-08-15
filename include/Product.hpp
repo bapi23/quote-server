@@ -13,15 +13,18 @@
 class Product: public ProductChangeListener{
 public:
 Product(const std::string productId, 
-        std::unique_ptr<ProductChangePublisher> publisher): 
+        std::unique_ptr<ProductChangePublisher> publisher,
+        FeedClient* feedClient): 
     m_productId(productId), 
+    m_orderBook(std::make_unique<OrderBook>()),
     m_publisher(std::move(publisher)),
-    m_orderBook(std::make_unique<OrderBook>()){
+    m_feedClient(feedClient)
+{
 
 }
 
 ~Product(){
-    feedClient->unsubscribe(m_productId);
+    m_feedClient->unsubscribe(m_productId);
 }
 
 void onProductChange(std::unique_ptr<ProductChange> pc) override {
@@ -55,6 +58,6 @@ private:
     std::string m_productId;
     std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<OrderBook> m_orderBook;
-    FeedClient* feedClient;
+    FeedClient* m_feedClient;
     std::unique_ptr<ProductChangePublisher> m_publisher;
 };

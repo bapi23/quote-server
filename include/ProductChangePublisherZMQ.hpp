@@ -28,12 +28,17 @@ public:
         {
             if(productId.find(productId))
                 throw std::runtime_error("Can't find product id in connection map!");
-            m_sock.bind("tcp://*:" + transport::prodIdToPort[productId]);
+            std::cout << "Binding product to uri: tcp://127.0.0.1:" + transport::prodIdToPort[productId];
+            m_sock.bind("tcp://127.0.0.1:" + transport::prodIdToPort[productId]);
         }
 
     void publish(OrderBookView* view){
+        std::chrono::steady_clock::time_point newTime = std::chrono::steady_clock::now();
+        auto difference = std::chrono::duration_cast<std::chrono::microseconds>(newTime - lastTime).count();
+        lastTime = newTime;
+
+        std::cout << "frequency = " << 1.0f/(float(difference)/1000000.0f) << "[Hz]" << std::endl;
         nlohmann::json jmessage;
-        nlohmann::json test = view->getAsks()[0];
         
         for(const auto& order: view->getAsks()){
             jmessage["asks"].push_back(order);
@@ -42,6 +47,7 @@ public:
         for(const auto& order: view->getBids()){
             jmessage["bids"].push_back(order);
         }
+        jmessage["message"] = "orderbook";
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
@@ -49,6 +55,9 @@ public:
     }
 
     void publish(std::unique_ptr<Trade> trade){
+        nlohmann::json jmessage;
+        std::cout << "SENDING TRADE" << std::endl;
+
         std::string payload = trade->generateMessage();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
@@ -57,4 +66,5 @@ public:
 
     zmq::context_t m_ctx;
     zmq::socket_t m_sock;
+    std::chrono::steady_clock::time_point lastTime;
 };
