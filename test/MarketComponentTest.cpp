@@ -5,7 +5,7 @@
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
 #include "ProductChangePublisherFactoryMock.hpp"
-#include "ProductChangeResetOrderBook.hpp"
+#include "product/ProductChangeResetOrderBook.hpp"
 
 #include "FeedClientSpy.hpp"
 

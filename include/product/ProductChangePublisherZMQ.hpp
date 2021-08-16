@@ -5,7 +5,7 @@
 #include <atomic>
 
 #include "ProductIdConnectionTable.hpp"
-#include "ProductChangePublisher.hpp"
+#include "product/ProductChangePublisher.hpp"
 
 using json = nlohmann::json;
 
@@ -24,7 +24,8 @@ class ProductChangePublisherZMQ: public ProductChangePublisher
 public:
     ProductChangePublisherZMQ(const std::string& productId):
         m_ctx(),
-        m_sock(m_ctx, zmq::socket_type::pub)
+        m_sock(m_ctx, zmq::socket_type::pub),
+        m_productId(productId)
         {
             if(productId.find(productId))
                 throw std::runtime_error("Can't find product id in connection map!");
@@ -48,6 +49,7 @@ public:
             jmessage["bids"].push_back(order);
         }
         jmessage["message"] = "orderbook";
+        jmessage["product_id"] = m_productId;
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
@@ -55,10 +57,17 @@ public:
     }
 
     void publish(std::unique_ptr<Trade> trade){
-        nlohmann::json jmessage;
+        
         std::cout << "SENDING TRADE" << std::endl;
 
         std::string payload = trade->generateMessage();
+
+        // TODO begin return nlohmann json or create TradeView!
+        auto jmessage = nlohmann::json::parse(payload); 
+        jmessage["prduct_id"] = m_productId;
+        payload = jmessage.dump();
+        // TODO end
+
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
         m_sock.send(message, zmq::send_flags::none);
@@ -67,4 +76,5 @@ public:
     zmq::context_t m_ctx;
     zmq::socket_t m_sock;
     std::chrono::steady_clock::time_point lastTime;
+    std::string m_productId;
 };

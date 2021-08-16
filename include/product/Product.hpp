@@ -5,7 +5,7 @@
 
 #include "Client.hpp"
 #include "ProductChangeListener.hpp"
-#include "ProductChangePublisher.hpp"
+#include "product/ProductChangePublisher.hpp"
 #include "OrderBook.hpp"
 #include "FeedClient.hpp"
 #include "Client.hpp"

@@ -112,7 +112,7 @@
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
 #include "ClientRegister.hpp"
-#include "ProductChangePublisherFactoryZMQ.hpp"
+#include "product/ProductChangePublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
 

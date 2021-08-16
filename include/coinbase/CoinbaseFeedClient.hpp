@@ -2,11 +2,10 @@
 #include <algorithm>
 #include <nlohmann/json.hpp>
 
-#include "RestTransport.hpp"
-#include "WebsocketTransport.hpp"
+#include "transport/RestTransport.hpp"
+#include "transport/WebsocketTransport.hpp"
 #include "FeedClient.hpp"
 #include "CoinbaseFeedListener.hpp"
-#include "FeedClient.hpp"
 
 auto subscribe_template = json::parse(R"({
     "type": "subscribe",

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ProductChangePublisherFactory.hpp"
+#include "product/ProductChangePublisherFactory.hpp"
 #include "ProductChangePublisherSpy.hpp"
 
 class ProductChangePublisherFactoryMock: public ProductChangePublisherFactory

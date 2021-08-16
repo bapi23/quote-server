@@ -1,6 +1,6 @@
-#include "Product.hpp"
+#include "product/Product.hpp"
 #include "Side.hpp"
-#include "TradeMatch.hpp"
+#include "trade/TradeMatch.hpp"
 #include "utils/FloatingP.hpp"
 
 class ProductChangeMatch: public ProductChange{

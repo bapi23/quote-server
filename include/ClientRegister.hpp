@@ -6,8 +6,8 @@
 #include <atomic>
 
 #include "utils/uuid.hpp"
-#include "ProductIdConnectionTable.hpp"
-#include "ProductSubscriber.hpp"
+#include "product/ProductIdConnectionTable.hpp"
+#include "product/ProductSubscriber.hpp"
 
 class ClientRegister{
 public:

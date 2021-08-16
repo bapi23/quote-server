@@ -8,7 +8,7 @@
 
 #include "ProductIdConnectionTable.hpp"
 #include "OrderBookView.hpp"
-#include "Trade.hpp"
+#include "trade/Trade.hpp"
 
 class ProductChangePublisher
 {

@@ -1,4 +1,4 @@
-#include "Product.hpp"
+#include "product/Product.hpp"
 #include "Side.hpp"
 
 class ProductChangeChange: public ProductChange{

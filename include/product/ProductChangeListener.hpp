@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "ProductChange.hpp"
+#include "product/ProductChange.hpp"
 
 class OrderBook;
 

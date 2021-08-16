@@ -5,11 +5,11 @@
 #include <unordered_map>
 #include <mutex>
 
-#include "Product.hpp"
-#include "ProductSubscriber.hpp"
+#include "product/Product.hpp"
+#include "product/ProductSubscriber.hpp"
 #include "Client.hpp"
 #include "FeedClient.hpp"
-#include "ProductChangePublisherFactory.hpp"
+#include "product/ProductChangePublisherFactory.hpp"
 
 class Market: public ProductSubscriber{
 public:

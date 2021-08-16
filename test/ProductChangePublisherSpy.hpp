@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ProductChangePublisher.hpp"
+#include "product/ProductChangePublisher.hpp"
 
 class ProductChangePublisherSpy: public ProductChangePublisher
 {

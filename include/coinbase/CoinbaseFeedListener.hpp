@@ -4,7 +4,7 @@
 
 
 #include "CoinbaseFeedMessageHandler.hpp"
-#include "WebsocketTransport.hpp"
+#include "transport/WebsocketTransport.hpp"
 #include "MessageReceiver.hpp"
 
 using json = nlohmann::json;

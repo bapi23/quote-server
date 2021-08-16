@@ -2,7 +2,7 @@
 
 #include <string>
 #include "OrderBook.hpp"
-#include "Trade.hpp"
+#include "trade/Trade.hpp"
 
 class Client{
 public:

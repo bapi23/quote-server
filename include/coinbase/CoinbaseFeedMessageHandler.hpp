@@ -2,12 +2,12 @@
 
 #include <memory>
 
-#include "ProductChangeListener.hpp"
-#include "ProductChangeResetOrderBook.hpp"
-#include "ProductChangeOpen.hpp"
-#include "ProductChangeDone.hpp"
-#include "ProductChangeMatch.hpp"
-#include "ProductChangeChange.hpp"
+#include "product/ProductChangeListener.hpp"
+#include "product/ProductChangeResetOrderBook.hpp"
+#include "product/ProductChangeOpen.hpp"
+#include "product/ProductChangeDone.hpp"
+#include "product/ProductChangeMatch.hpp"
+#include "product/ProductChangeChange.hpp"
 #include "MessageReceiver.hpp"
 #include "Order.hpp"
 

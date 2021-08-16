@@ -74,7 +74,7 @@ Client needs to get clientId to be able to subscribe and receive OrderBook and T
 ```plantuml
 @startuml "Client registration"
 ClientTransport->ClientServer: register()
-ClientServer->ClientTransport: sendClientId(id)
+ClientRegister->Market: subscribe(id)
 ClientTransport->ClientServer: subscribe(clientId, productId)
 @enduml
 @enduml

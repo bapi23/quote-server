@@ -1,5 +1,5 @@
 #pragma once
-#include "ProductChangePublisher.hpp"
+#include "product/ProductChangePublisher.hpp"
 
 class ProductChangePublisherFactory{
 public:

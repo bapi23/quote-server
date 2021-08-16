@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <string>
 
-#include "Trade.hpp"
+#include "trade/Trade.hpp"
 
 class OrderBook;
 

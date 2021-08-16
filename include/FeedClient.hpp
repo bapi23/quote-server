@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include <ProductChangeListener.hpp>
+#include "product/ProductChangeListener.hpp"
 
 class FeedClient{
 public:
