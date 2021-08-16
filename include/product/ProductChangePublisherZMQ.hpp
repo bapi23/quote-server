@@ -53,23 +53,22 @@ public:
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
+        std::cout << "Publishing order book for: [" << m_productId << "]" << std::endl;
         m_sock.send(message, zmq::send_flags::none);
     }
 
     void publish(std::unique_ptr<Trade> trade){
-        
-        std::cout << "SENDING TRADE" << std::endl;
-
         std::string payload = trade->generateMessage();
 
         // TODO begin return nlohmann json or create TradeView!
         auto jmessage = nlohmann::json::parse(payload); 
-        jmessage["prduct_id"] = m_productId;
+        jmessage["product_id"] = m_productId;
         payload = jmessage.dump();
         // TODO end
 
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
+        std::cout << "Publishing trade for: [" << m_productId << "]" << std::endl;
         m_sock.send(message, zmq::send_flags::none);
     }
 

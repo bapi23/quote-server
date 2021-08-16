@@ -48,6 +48,8 @@ public:
                 }
             }
             m_messageQueue.push_front(fullOrderbookMessage);
+            m_messageQueue = relevantMessages;
+
         }
         m_messages_cv.notify_one();
     }
@@ -57,7 +59,7 @@ public:
 
         int sequence = jmessage["sequence"].get<int>();
         if (m_lastSequenceNumber != 0){
-            if( sequence > m_lastSequenceNumber+1){
+            if( sequence > m_lastSequenceNumber + 1){
                 // we have a gap between sequence numbers - reinitializing everything:
                 m_lastSequenceNumber = 0;
                 {
@@ -101,7 +103,7 @@ public:
 
 private:
     std::string m_productId;
-    CoinbaseFeedMessageHandler m_msgHandler;
+    std::shared_ptr<CoinbaseFeedMessageHandler> m_msgHandler; //TODO pass it to the notifyHandler! to ensure that it's not deleted/deleted while running it on another thread! and same for all other data!
     std::deque<std::string> m_messageQueue;
     int m_lastSequenceNumber;
     std::mutex m_messagesMutex;

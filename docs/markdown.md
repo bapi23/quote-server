@@ -1,9 +1,9 @@
-## QOS Server design
+## QS Server design
 
 ### Transport side
 
 ##### FeedClient sequence diagram
-WebsocketTransport signals message reception by MessageReceiver interface
+WebsocketTransport signals message reception by MessageReceiver interface. It shows example of implementation for Coinbase
 ```plantuml
 @startuml "Message Received"
 CoinbaseFeedApi->WebsocketTransport: onMessage(msg)
@@ -13,6 +13,10 @@ CoinbaseFeedListener->CoinbaseFeedMessageHandler: OnMessageReceiver(msg)
 CoinbaseFeedMessageHandler->ProductChangeListener: OnProductChanged(ProductChange)
 @enduml
 ```
+
+* WebsocketTransport is responsible for Websocket layer and communication between Coinbase/other websocket api with the rest of the qs server
+* CoinbaseFeedClient implements MessageReceiver interface and provides initial logic related to the Coinbase api - mainly message dispatching
+* CoinbaseFeedListener implements logic
 
 ##### FeedClient class diagram
 CoinbaseFeedClient, CoinbaseFeedListener and CoinbaseMessageHandler implements some kind of decorator pattern by implementing MessageReceiver interface.

@@ -32,12 +32,10 @@ void onProductChange(std::unique_ptr<ProductChange> pc) override {
     bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
     if(!trades.empty()){
         for(auto& trade: trades){
-            std::cout << "Publishing trade" << std::endl;
             m_publisher->publish(std::move(trade));
         }
     }
     if(bookUpdated){
-        std::cout << "Publishing order book" << std::endl;
         m_publisher->publish(m_orderBook.get());
     }
 }

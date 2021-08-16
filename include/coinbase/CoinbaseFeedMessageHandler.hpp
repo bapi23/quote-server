@@ -16,8 +16,8 @@ using json = nlohmann::json;
 class CoinbaseFeedMessageHandler: public MessageReceiver{
 public:
     CoinbaseFeedMessageHandler(std::weak_ptr<ProductChangeListener> listener):m_listener(listener){
-
     }
+
     void onMessageReceived(const std::string& msg) override{
         //.. create change
         auto jmsg = json::parse(msg);
@@ -54,7 +54,6 @@ public:
                 std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << jmsg["order_id"].get<std::string>() << std::endl;
                 const std::string orderId = jmsg["order_id"].get<std::string>();
                 const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
-                std::cout << "Received feed message:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
                 pc = std::make_unique<ProductChangeDone>(orderId, side);
             } else if (jmsg["type"].get<std::string>() == "match") {
                 const std::string makerOrderId = jmsg["maker_order_id"].get<std::string>();

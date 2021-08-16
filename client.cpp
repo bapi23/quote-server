@@ -72,9 +72,9 @@ void handleFeedMessages(){
             auto jmsg = nlohmann::json::parse(message);
              if(jmsg.contains("message")){
                  if(jmsg["message"] == "trade") {
-                    std::cout << "Received new trade message of type: " << jmsg["type"] << std::endl;
+                    std::cout << "["<< jmsg["product_id"] << "] " << " Received new trade message of type: " << jmsg["type"] << std::endl;
                  } else if(jmsg["message"] == "orderbook"){
-                    std::cout << "Received new orderbook message" << std::endl;
+                    std::cout << "["<< jmsg["product_id"] << "] " << "Received new orderbook message" << std::endl;
                  }
              } else {
                  std::cout << "Received unsupported message type" << std::endl;

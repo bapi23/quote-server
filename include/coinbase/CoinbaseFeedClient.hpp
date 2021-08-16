@@ -43,7 +43,7 @@ public:
                     it->second->onMessageReceived(message);
                 }
             } else if(jmsg.contains("type") && jmsg["type"].contains("subscriptions")){
-                //@TODO received subscription message!
+                std::cout << "Received subscribe message" << std::endl;
             }
 
         } catch(nlohmann::detail::parse_error){

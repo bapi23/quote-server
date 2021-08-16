@@ -50,6 +50,7 @@ private:
                         sock.send(message, zmq::send_flags::none);
                         std::cout << "Sent client id request response" << std::endl;
                         registeredClientIds.insert(clientId);
+                        std::cout << "Registered already " << registeredClientIds.size() << std::endl;
 
                     } else if (jmsg["type"] =="subscribe_request"){
                         std::cout << "Received subscribe_request" << std::endl;

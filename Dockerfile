@@ -23,12 +23,12 @@ RUN git clone https://github.com/zeromq/cppzmq.git && \
     mkdir build && cd build && \
     cmake -DCPPZMQ_BUILD_TESTS=OFF .. && make -j install
 
-COPY . /app/src/qos_server/
-WORKDIR /app/src/qos_server/
+COPY . /app/src/qs_server/
+WORKDIR /app/src/qs_server/
 
 RUN mkdir build && cd build  \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
     && cmake --build . -- -j4; \
     fi
 
-CMD /app/src/qos_server/build/qos_server
+CMD /app/src/qs_server/build/qs_server
