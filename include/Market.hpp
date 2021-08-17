@@ -44,8 +44,8 @@ public:
         if(!it->second->hasClients())
         {
             std::cout << "No more clients for " << prodId << " unsubscribing";
-            m_products.erase(prodId);
             m_feedClient->unsubscribe(prodId);
+            m_products.erase(prodId);
         }
     }
 

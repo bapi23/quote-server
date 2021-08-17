@@ -34,12 +34,12 @@ It will run demo with the server and the client configured for ETH-USD and BTC-U
 
 Client is implemented in a way to execute provided scenario. For example:
 ```
-/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 sub BTC-USD 2 --server-endpoint tcp://127.0.0.1:9090
+/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 sub BTC-USD 2 --server-endpoint tcp://127.0.0.1:10090
 ```
 Will subscribe for ETH-USD after 1 second from running client and BTC-USD after 2 seconds.
 You can also write subscribe/unsubscribe scenarios:
 ```
-/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 unsub ETH-USD 10 --server-endpoint tcp://127.0.0.1:9090
+/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 unsub ETH-USD 10 --server-endpoint tcp://127.0.0.1:10090
 ```
 
 ### Run it natively
@@ -49,7 +49,7 @@ qs-server
 ```
 And run in another terminal
 ```
-client --prod-ids sub ETH-USD 1 unsub ETH-USD 10 --server-endpoint tcp://127.0.0.1:9090
+client --prod-ids sub ETH-USD 1 unsub ETH-USD 10 --server-endpoint tcp://127.0.0.1:10090
 ```
 
 ## Implementation documentation

@@ -11,4 +11,4 @@ services:
         image: "qs_server"
         container_name: client
         network_mode: host
-        command: bash -c "/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 sub BTC-USD 2 --server-endpoint tcp://127.0.0.1:9090"
+        command: bash -c "/app/src/qs_server/build/client --prod-ids sub ETH-USD 1 sub BTC-USD 2 --server-endpoint tcp://127.0.0.1:10090"

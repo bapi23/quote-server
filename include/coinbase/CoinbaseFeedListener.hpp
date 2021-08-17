@@ -15,15 +15,18 @@ public:
         m_productId(productId), 
         m_msgHandler(listener), 
         m_messageQueue(), 
-        m_lastSequenceNumber(0)
+        m_lastSequenceNumber(0),
+        m_messageHandlerThread(std::bind(&CoinbaseFeedListener::notifyHandler, this))
     {
-        std::thread(std::bind(&CoinbaseFeedListener::notifyHandler, this)).detach();
         requestFullOrderBook();
     }
 
     void requestFullOrderBook(){
         std::cout << "Requesting full orderbook" << std::endl;
-        std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)).detach();
+        if(m_fullOrderBookRequestThread && m_fullOrderBookRequestThread->joinable()){
+            m_fullOrderBookRequestThread->join();
+        }
+        m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)));
     }
 
     void requestFullOrderBookImpl(){
@@ -98,15 +101,19 @@ public:
     CoinbaseFeedListener& operator=(CoinbaseFeedListener&) = delete;
 
     ~CoinbaseFeedListener(){
+        m_fullOrderBookRequestThread->join();
         m_isRunning.store(false);
+        m_messageHandlerThread.join();
     }
 
 private:
     std::string m_productId;
-    std::shared_ptr<CoinbaseFeedMessageHandler> m_msgHandler; //TODO pass it to the notifyHandler! to ensure that it's not deleted/deleted while running it on another thread! and same for all other data!
+    CoinbaseFeedMessageHandler m_msgHandler;
     std::deque<std::string> m_messageQueue;
     int m_lastSequenceNumber;
     std::mutex m_messagesMutex;
     std::condition_variable m_messages_cv;
     std::atomic<bool> m_isRunning{true};
+    std::thread m_messageHandlerThread;
+    std::unique_ptr<std::thread> m_fullOrderBookRequestThread;
 };

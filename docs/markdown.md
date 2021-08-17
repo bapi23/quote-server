@@ -16,7 +16,7 @@ CoinbaseFeedMessageHandler->ProductChangeListener: OnProductChanged(ProductChang
 
 * WebsocketTransport is responsible for Websocket layer and communication between Coinbase/other websocket api with the rest of the qs server
 * CoinbaseFeedClient implements MessageReceiver interface and provides initial logic related to the Coinbase api - mainly message dispatching
-* CoinbaseFeedListener implements logic
+* CoinbaseFeedListener implements logic responsible for ensuring that messages comes in the right order by ensuring that all 
 
 ##### FeedClient class diagram
 CoinbaseFeedClient, CoinbaseFeedListener and CoinbaseMessageHandler implements some kind of decorator pattern by implementing MessageReceiver interface.

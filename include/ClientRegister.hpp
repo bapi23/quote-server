@@ -25,7 +25,7 @@ private:
     void runImpl(){
         zmq::context_t ctx;
         zmq::socket_t sock(ctx, zmq::socket_type::rep);
-        sock.bind("tcp://*:9090");
+        sock.bind("tcp://*:10090");
         while(isRunning){         
             zmq::message_t message;
             //std::cout << "Waiting for the message" << std::endl;

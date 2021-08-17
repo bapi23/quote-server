@@ -83,7 +83,7 @@ private:
     }
 
     std::string generateUnsubscribeMessage(const std::string& productId){
-        auto message = subscribe_template;
+        auto message = unsibscribe_template;
         message["product_ids"] = {productId};
         return message.dump();
     }
