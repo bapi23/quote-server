@@ -1,3 +1,5 @@
+#pragma once
+
 #include "product/Product.hpp"
 #include "Side.hpp"
 #include "trade/TradeDone.hpp"
@@ -19,7 +21,9 @@ public:
 
 
     ProductChangeDone(const std::string& orderId,
-                       Side side):
+                       Side side,
+                      std::string productId):
+                ProductChange(productId),
                 m_orderId(orderId),
                 m_side(side)
 

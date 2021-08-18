@@ -40,7 +40,7 @@ TEST_CASE("ProductShouldPublishFullOrderbook", "MarketTest") {
     std::vector<Order> bids = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     std::vector<Order> asks = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     auto prodChangReq = 
-        std::make_unique<ProductChangeResetOrderBook>(bids, asks);
+        std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>());
     feedPtr->m_listeners["ETH-USD"].lock()->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_asks.size() == 2);

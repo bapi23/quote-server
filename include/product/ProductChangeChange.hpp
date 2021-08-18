@@ -1,3 +1,5 @@
+#pragma once
+
 #include "product/Product.hpp"
 #include "Side.hpp"
 
@@ -15,7 +17,9 @@ public:
     ProductChangeChange(const std::string& orderId, 
                       FloatingP price, 
                       FloatingP remainingSize, 
-                      Side side):
+                      Side side,
+                      std::string productId):
+                ProductChange(productId),
                 m_orderId(orderId),
                 m_price(price),
                 m_remainingSize(remainingSize),

@@ -111,7 +111,7 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "Market.hpp"
-#include "ClientRegister.hpp"
+#include "ClientService.hpp"
 #include "product/ProductChangePublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
@@ -121,7 +121,7 @@ int main(int argc, char* argv[]) {
     auto feed = std::make_unique<CoinbaseFeedClient>();
     std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
     std::unique_ptr<Market> market = std::make_unique<Market>(std::move(feed), std::move(publisherFactory));
-    ClientRegister clientReg(market.get(), "127.0.0.1");
+    ClientService clientReg(market.get(), "127.0.0.1");
     clientReg.run();
     bool done = false;
 

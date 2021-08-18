@@ -11,7 +11,7 @@
 #include "FeedClient.hpp"
 #include "product/ProductChangePublisherFactory.hpp"
 
-class Market: public ProductSubscriber{
+class Market: public ProductSubscriber, ProductChangeListener{
 public:
     Market(std::unique_ptr<FeedClient> feedClient, 
            std::unique_ptr<ProductChangePublisherFactory> publisherFactory):
@@ -19,6 +19,18 @@ public:
         m_publisherFactory(std::move(publisherFactory))
     {
     }
+
+    void onProductChange(std::unique_ptr<ProductChange> pc) override {
+        std::lock_guard<std::mutex> lg(marketDataMutex);
+
+        auto prodIt = m_products.find(pc->getProductId());
+        if(prodIt != m_products.end()){
+            prodIt->second->onProductChange(std::move(pc));
+        } else {
+            std::cout << "No product with" << pc->getProductId() << " id" << std::endl;
+        }
+    }
+
     void subscribe(const std::string& clientId, const std::string& prodId) override {
         std::lock_guard<std::mutex> lg(marketDataMutex);
 
@@ -29,10 +41,10 @@ public:
 
         auto prodIt = m_products.find(prodId);
         if(prodIt == m_products.end()){
-            m_products.insert({prodId, std::make_shared<Product>(prodId, m_publisherFactory->createPublisher(prodId), m_feedClient.get())});
+            m_products.insert({prodId, std::make_shared<Product>(prodId, m_publisherFactory->createPublisher(prodId))});
         }
 
-        m_feedClient->subscribe(prodId, m_products[prodId]);
+        m_feedClient->subscribe(prodId, this);
     }
 
     void unsubscribe(const std::string& clientId, const std::string& prodId) override {

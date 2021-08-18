@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <thread>
 #include <zmq_addon.hpp>
@@ -9,16 +11,16 @@
 #include "product/ProductIdConnectionTable.hpp"
 #include "product/ProductSubscriber.hpp"
 
-class ClientRegister{
+class ClientService{
 public:
-    ClientRegister(ProductSubscriber* productSubscriber, const std::string& endpoint_address):
+    ClientService(ProductSubscriber* productSubscriber, const std::string& endpoint_address):
     m_productSubscriber(productSubscriber),
     m_endpoint_address(endpoint_address)
     {
     }
 
     void run(){
-        std::thread(std::bind(&ClientRegister::runImpl, this)).detach();
+        std::thread(std::bind(&ClientService::runImpl, this)).detach();
     }
 
 private:

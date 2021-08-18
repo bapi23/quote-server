@@ -1,9 +1,11 @@
+#pragma once
+
 #include <vector>
 #include <algorithm>
-#include <nlohmann/json.hpp>
+#include "nlohmann/json.hpp"
 
-#include "transport/RestTransport.hpp"
-#include "transport/WebsocketTransport.hpp"
+#include "RestTransport.hpp"
+#include "WebsocketTransport.hpp"
 #include "FeedClient.hpp"
 #include "CoinbaseFeedListener.hpp"
 
@@ -32,6 +34,7 @@ public:
     }
 
     void onMessageReceived(const std::string& message){
+        std::lock_guard<std::mutex> lg(mutexFeedData);
         try{
             auto jmsg = json::parse(message);
             if(jmsg.contains("product_id")){
@@ -40,7 +43,7 @@ public:
                 if(it == prodIdToListener.end()){
                     std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
                 } else {
-                    it->second->onMessageReceived(message);
+                    it->second->onMessageReceived(jmsg);
                 }
             } else if(jmsg.contains("type") && jmsg["type"].contains("subscriptions")){
                 std::cout << "Received subscribe message" << std::endl;
@@ -52,26 +55,31 @@ public:
 
     }
 
-    void subscribe(const std::string& productId, std::weak_ptr<ProductChangeListener> listener) override{
-        if(!m_connected){
-            feedTransport.subscribe("coinbaseFeed", this);
-            feedTransport.connect("wss://ws-feed.pro.coinbase.com");
-            m_connected = true;
-            
+    void subscribe(const std::string& productId, ProductChangeListener* listener) override{
+        std::lock_guard<std::mutex> lg(mutexFeedData);
+        {
+            if(!m_connected){
+                feedTransport.subscribe("coinbaseFeed", this);
+                feedTransport.connect("wss://ws-feed.pro.coinbase.com");
+                m_connected = true;
+                
+            }
+            auto it = prodIdToListener.find(productId);
+            if(it == prodIdToListener.end()){
+                prodIdToListener.emplace(
+                    std::make_pair(productId, std::make_unique<CoinbaseFeedListener>(productId, listener)));
+            } else {
+                std::cout << "listener already registered";
+            }
+            std::cout << "Registering listener for prod id: " << productId << std::endl;
         }
-        auto it = prodIdToListener.find(productId);
-        if(it == prodIdToListener.end()){
-            prodIdToListener.emplace(
-                std::make_pair(productId, std::make_unique<CoinbaseFeedListener>(productId, listener)));
-        } else {
-            std::cout << "listener already registered";
-        }
-        std::cout << "Registering listener for prod id: " << productId << std::endl;
         feedTransport.send(generateSubscribeMessage(productId));
     }
 
     void unsubscribe(const std::string& productId) override{
+        std::cout << "Unsubscribed " << productId << std::endl;
         feedTransport.send(generateUnsubscribeMessage(productId));
+        std::lock_guard<std::mutex> lg(mutexFeedData);
         prodIdToListener.erase(productId);
     }
 
@@ -91,4 +99,6 @@ private:
     std::unordered_map<std::string, std::unique_ptr<CoinbaseFeedListener>> prodIdToListener;
     WebsocketTransport feedTransport;
     bool m_connected = false;
+
+    std::mutex mutexFeedData;
 };

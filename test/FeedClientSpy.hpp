@@ -1,10 +1,12 @@
+#pragma once
+
 #include "FeedClient.hpp"
 #include <unordered_map>
 
 class FeedClientSpy: public FeedClient
 {
 public:
-    virtual void subscribe(const std::string& product_id, std::weak_ptr<ProductChangeListener> listener){
+    virtual void subscribe(const std::string& product_id, ProductChangeListener* listener){
         m_listeners[product_id] = listener;
     }
     virtual void unsubscribe(const std::string& product_id){

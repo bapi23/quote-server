@@ -10,24 +10,18 @@
 #include "FeedClient.hpp"
 #include "Client.hpp"
 
-class Product: public ProductChangeListener{
+class Product {
 public:
 Product(const std::string productId, 
-        std::unique_ptr<ProductChangePublisher> publisher,
-        FeedClient* feedClient): 
+        std::unique_ptr<ProductChangePublisher> publisher): 
     m_productId(productId), 
     m_orderBook(std::make_unique<OrderBook>()),
-    m_publisher(std::move(publisher)),
-    m_feedClient(feedClient)
+    m_publisher(std::move(publisher))
 {
 
 }
 
-~Product(){
-    m_feedClient->unsubscribe(m_productId);
-}
-
-void onProductChange(std::unique_ptr<ProductChange> pc) override {
+void onProductChange(std::unique_ptr<ProductChange> pc) {
     std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
     if(!trades.empty()){
@@ -56,6 +50,5 @@ private:
     std::string m_productId;
     std::unordered_map<std::string, Client*> m_clients;
     std::unique_ptr<OrderBook> m_orderBook;
-    FeedClient* m_feedClient;
     std::unique_ptr<ProductChangePublisher> m_publisher;
 };

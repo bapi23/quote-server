@@ -1,3 +1,5 @@
+#pragma once
+
 #include <iostream>
 #include <thread>
 #include <zmq_addon.hpp>
@@ -38,7 +40,7 @@ public:
         auto difference = std::chrono::duration_cast<std::chrono::microseconds>(newTime - lastTime).count();
         lastTime = newTime;
 
-        std::cout << "frequency = " << 1.0f/(float(difference)/1000000.0f) << "[Hz]" << std::endl;
+        //std::cout << "frequency = " << 1.0f/(float(difference)/1000000.0f) << "[Hz]" << std::endl;
         nlohmann::json jmessage;
         
         for(const auto& order: view->getAsks()){

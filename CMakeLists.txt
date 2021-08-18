@@ -11,7 +11,7 @@ find_package(OpenSSL REQUIRED)
 find_package(cppzmq)
 
 add_executable(qs_server server.cpp)
-target_include_directories(qs_server PRIVATE ext/websocketpp ext/curlpp/include include)
+target_include_directories(qs_server PRIVATE ext/websocketpp ext/curlpp/include include/transport include)
 target_link_libraries (qs_server ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
 set_property(TARGET qs_server APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 set_target_properties(qs_server PROPERTIES
@@ -20,7 +20,7 @@ set_target_properties(qs_server PROPERTIES
             )
 
 add_executable(client client.cpp)
-target_include_directories(client PRIVATE ext/websocketpp ext/curlpp/include include)
+target_include_directories(client PRIVATE ext/websocketpp ext/curlpp/include include/transport include)
 target_link_libraries (client ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
 set_property(TARGET client APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 set_target_properties(client PROPERTIES
@@ -28,15 +28,15 @@ set_target_properties(client PROPERTIES
             CXX_EXTENSIONS OFF
             )
 
-add_executable(MarketComponentTest test/MarketComponentTest.cpp ext/catch2/catch2/catch.cpp)
-target_include_directories(MarketComponentTest PRIVATE ext/websocketpp ext/curlpp/include ext/catch2/ include)
-target_link_libraries (MarketComponentTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
-set_property(TARGET MarketComponentTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
+# add_executable(MarketComponentTest test/MarketComponentTest.cpp ext/catch2/catch2/catch.cpp)
+# target_include_directories(MarketComponentTest PRIVATE ext/websocketpp ext/curlpp/include ext/catch2/ /test/transport include)
+# target_link_libraries (MarketComponentTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+# set_property(TARGET MarketComponentTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
-set_target_properties(MarketComponentTest PROPERTIES
-            CXX_STANDARD 17
-            CXX_EXTENSIONS OFF
-            )
+# set_target_properties(MarketComponentTest PROPERTIES
+#             CXX_STANDARD 17
+#             CXX_EXTENSIONS OFF
+#             )
 
 
 
