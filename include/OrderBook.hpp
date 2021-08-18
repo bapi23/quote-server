@@ -72,7 +72,7 @@ public:
         if(side == Side::Sell){
             auto it = std::find_if(m_bids.begin(), m_bids.end(), 
                     [&makerOrderId](const Order& o){ return o.order_id == makerOrderId; });
-            if(it == m_asks.end()){
+            if(it == m_bids.end()){
                 std::cout << "Can't update - matched order doesn't exists! Order id: " << makerOrderId << std::endl;
                 return;
             }

@@ -41,7 +41,12 @@ public:
         lastTime = newTime;
 
         //std::cout << "frequency = " << 1.0f/(float(difference)/1000000.0f) << "[Hz]" << std::endl;
-        nlohmann::json jmessage;
+        nlohmann::json jmessage = {
+            {"asks", {}},
+            {"bids", {}},
+            {"message", "orderbook"},
+            {"product_id", m_productId}
+        };
         
         for(const auto& order: view->getAsks()){
             jmessage["asks"].push_back(order);
@@ -50,8 +55,6 @@ public:
         for(const auto& order: view->getBids()){
             jmessage["bids"].push_back(order);
         }
-        jmessage["message"] = "orderbook";
-        jmessage["product_id"] = m_productId;
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());

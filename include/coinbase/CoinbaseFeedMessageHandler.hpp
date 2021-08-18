@@ -90,10 +90,10 @@ private:
             } else if (jmsg["type"].get<std::string>() == "received") {
             
             } else {
-               std::cout << "Unsupported message type: " << jmsg << std::endl;
+               //std::cout << "Unsupported message type: " << jmsg << std::endl;
             }
         } else {
-            std::cout << "Can't handle message:"<< jmsg << std::endl;
+            //std::cout << "Can't handle message:"<< jmsg << std::endl;
         }
         return pc;
     }

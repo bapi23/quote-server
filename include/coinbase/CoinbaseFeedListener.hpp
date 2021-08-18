@@ -27,6 +27,7 @@ public:
         std::cout << "Requesting full orderbook" << std::endl;
         if(m_isRunning){
             if(m_fullOrderBookRequestThread && m_fullOrderBookRequestThread->joinable()){
+                std::cout << "joining" << std::endl;
                 m_fullOrderBookRequestThread->join();
             }
             m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)));
@@ -59,11 +60,9 @@ public:
     }
 
     ~CoinbaseFeedListener(){
-        m_isRunning.store(false);
+        m_isRunning = false;
         m_fullOrderBookRequestThread->join();
         m_messageHandlerThread.join();
-        std::cout << "is joinable <<" << m_fullOrderBookRequestThread->joinable() << std::endl;
-        std::cout << "is joinable <<" << m_messageHandlerThread.joinable() << std::endl;
     }
 
 private:
@@ -73,8 +72,13 @@ private:
 
         if(!fullOrderbookMessage.empty()){
             auto orderBookMsg = nlohmann::json::parse(fullOrderbookMessage);
-            const auto orderBookSequence = orderBookMsg["sequence"];
+            if(!orderBookMsg.contains("sequence"))
+                std::cout << "INVALID ORDERBOOK RECEIVED - APPLICATION CAN'T WORK WITHOUT IT:(" << std::endl<< std::flush;
+                return;
+
             std::lock_guard<std::mutex> lg(m_messagesMutex);
+            const auto orderBookSequence = orderBookMsg["sequence"];
+            m_lastSequenceNumber = orderBookSequence;
             m_lastSequenceNumber = orderBookSequence;
             while(!m_messageQueue.empty()){
                 auto message = m_messageQueue.front();
@@ -94,10 +98,11 @@ private:
 
     void messageLoop(){
         while(m_isRunning){
+            using namespace std::chrono_literals;
             std::deque<nlohmann::json> messages;
             {
                 std::unique_lock<std::mutex> lk(m_messagesMutex);
-                m_messages_cv.wait(lk, [this]{return !m_messageQueue.empty();});
+                m_messages_cv.wait_for(lk, 10ms, [this]{return !m_messageQueue.empty();});
                 messages = m_messageQueue;
                 m_messageQueue.clear();
             }

@@ -41,7 +41,7 @@ public:
                 auto prodId = jmsg["product_id"].get<std::string>();
                 auto it = prodIdToListener.find(prodId);
                 if(it == prodIdToListener.end()){
-                    std::cout << "ERROR: got product id which was not subscribed to!" << std::endl;
+                    std::cout << "Got product id which was not subscribed to!" << std::endl;
                 } else {
                     it->second->onMessageReceived(jmsg);
                 }

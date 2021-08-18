@@ -22,8 +22,8 @@ Product(const std::string productId,
 }
 
 void onProductChange(std::unique_ptr<ProductChange> pc) {
-    std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
+    std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     if(!trades.empty()){
         for(auto& trade: trades){
             m_publisher->publish(std::move(trade));
