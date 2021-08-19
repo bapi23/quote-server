@@ -40,8 +40,8 @@ TEST_CASE("ProductShouldPublishFullOrderbook", "MarketTest") {
     std::vector<Order> bids = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     std::vector<Order> asks = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     auto prodChangReq = 
-        std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>());
-    feedPtr->m_listeners["ETH-USD"].lock()->onProductChange(std::move(prodChangReq));
+        std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD");
+    feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_asks.size() == 2);
     REQUIRE(publisherFactoryPtr->pubPtr->m_bids.size() == 2);
@@ -61,8 +61,8 @@ TEST_CASE("ProductShouldPublishTrade", "MarketTest") {
     REQUIRE(feedPtr->m_listeners.size() == 1);
 
     auto prodChangReq = 
-        std::make_unique<ProductChangeDone>("order_id", Side::Buy);
-    feedPtr->m_listeners["ETH-USD"].lock()->onProductChange(std::move(prodChangReq));
+        std::make_unique<ProductChangeDone>("order_id", Side::Buy, "ETH-USD");
+    feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_trades.size() == 1);
 

@@ -37,16 +37,23 @@ public:
         std::lock_guard<std::mutex> lg(mutexFeedData);
         try{
             auto jmsg = json::parse(message);
+            if(!jmsg.contains("type")){
+                std::cout << "Received message without type" << std::endl;
+                return;
+            }
+
             if(jmsg.contains("product_id")){
                 auto prodId = jmsg["product_id"].get<std::string>();
                 auto it = prodIdToListener.find(prodId);
                 if(it == prodIdToListener.end()){
-                    std::cout << "Got product id which was not subscribed to!" << std::endl;
+                    //std::cout << "Got product id which was not subscribed to!" << std::endl;
                 } else {
                     it->second->onMessageReceived(jmsg);
                 }
-            } else if(jmsg.contains("type") && jmsg["type"].contains("subscriptions")){
-                std::cout << "Received subscribe message" << std::endl;
+            } else if(jmsg["type"] == "subscriptions"){
+                std::cout << "Received subscribe message" << jmsg << std::endl;
+            } else if(jmsg["type"] == "unsubscribe"){
+                std::cout << "Received unsubscribe message" << jmsg << std::endl;
             }
 
         } catch(nlohmann::detail::parse_error){
@@ -78,6 +85,7 @@ public:
 
     void unsubscribe(const std::string& productId) override{
         std::cout << "Unsubscribed " << productId << std::endl;
+        std::cout << "generated message" << generateUnsubscribeMessage(productId) << std::endl;
         feedTransport.send(generateUnsubscribeMessage(productId));
         std::lock_guard<std::mutex> lg(mutexFeedData);
         prodIdToListener.erase(productId);

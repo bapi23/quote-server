@@ -13,5 +13,5 @@ public:
         m_listeners.erase(product_id);
     }
 
-std::unordered_map<std::string, std::weak_ptr<ProductChangeListener>> m_listeners;
+std::unordered_map<std::string, ProductChangeListener*> m_listeners;
 };

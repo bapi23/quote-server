@@ -18,7 +18,7 @@ public:
     bool updateOrderBook(OrderBook* orderBook) const override{
         std::cout << "Reinitializing orderbook with " << m_bids.size() << " bids, "
                                                       << m_asks.size() << " asks and "
-                                                      << m_toMerge.size() << "updates" << std::endl; 
+                                                      << m_toMerge.size() << " updates" << std::endl; 
         
         std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
         orderBook->init(m_bids, m_asks);
@@ -29,8 +29,6 @@ public:
         std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
 
         std::cout << "Reinitializing took = " << std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count() << "[µs]" << std::endl;
-        std::cout << "Reinitializing took = " << std::chrono::duration_cast<std::chrono::nanoseconds> (end - begin).count() << "[ns]" << std::endl;
-
         return true;
     }
 

@@ -34,11 +34,5 @@ public:
     }
 
 private:
-    WebsocketTransport(WebsocketTransport& wt) = default;
-    WebsocketTransport& operator=(const WebsocketTransport& wt) = default;
-
-    websocket_client m_client;
-    websocketpp::connection_hdl m_hdl;
-    websocketpp::lib::shared_ptr<websocketpp::lib::thread> m_thread;
     std::unordered_map<std::string, MessageReceiver*> subscribers;
 };

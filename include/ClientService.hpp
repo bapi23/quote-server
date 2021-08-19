@@ -139,7 +139,9 @@ private:
                                 // TODO send full list of subscription
                             };
                             data = jmessage.dump();
+                            std::cout << "Got error while reading unsibscribe message" << error << std::endl;
                         } else {
+                            std::cout << "UBSUBSCIRBING" << std::endl;
                             m_productSubscriber->unsubscribe(clientId, productId);
 
                             nlohmann::json jmessage = {

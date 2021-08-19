@@ -58,7 +58,7 @@ public:
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
-        std::cout << "Publishing order book for: [" << m_productId << "]" << std::endl;
+        //std::cout << "Publishing order book for: [" << m_productId << "]" << std::endl;
         m_sock.send(message, zmq::send_flags::none);
     }
 
@@ -73,7 +73,7 @@ public:
 
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
-        std::cout << "Publishing trade for: [" << m_productId << "]" << std::endl;
+        //std::cout << "Publishing trade for: [" << m_productId << "]" << std::endl;
         m_sock.send(message, zmq::send_flags::none);
     }
 
