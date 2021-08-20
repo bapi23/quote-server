@@ -2,6 +2,8 @@
 
 #include <sstream>
 #include <vector>
+#include <thread>
+#include <chrono>
 
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>
@@ -9,6 +11,8 @@
 #include <curlpp/Exception.hpp>
 
 #include "Order.hpp"
+
+using namespace std::chrono_literals;
 
 void to_json(nlohmann::json& j, const Order& o) {
     nlohmann::json message;
@@ -29,6 +33,8 @@ public:
     static std::string request(const std::string& address){
         nlohmann::json message;
 
+        std::this_thread::sleep_for(std::chrono::milliseconds(request_time_in_ms));
+
         message["sequence"] = 1;
         for(const auto& bid: bids){
             message["bids"].push_back(bid);
@@ -42,8 +48,10 @@ public:
     static int sequence;
     static std::vector<Order> bids;
     static std::vector<Order> asks;
+    static int request_time_in_ms;
 };
 
 int RestTransport::sequence = 1;
+int RestTransport::request_time_in_ms = 2000;
 std::vector<Order> RestTransport::bids;
 std::vector<Order> RestTransport::asks;

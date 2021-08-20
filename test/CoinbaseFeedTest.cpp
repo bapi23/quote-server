@@ -54,7 +54,7 @@ TEST_CASE("DoneMessageReceivedShouldAdd", "CoibaseFeedTest") {
 
     RestTransport::bids.push_back(Order{1.1, 100, "OrderNb1"});
     RestTransport::asks.push_back(Order{1.1, 100, "OrderNb2"});
-    std::cout <<  RestTransport::request("fff");
+    RestTransport::request_time_in_ms = 0;
     ProductListener listener;
     {
       CoinbaseFeedClient client;
@@ -70,6 +70,32 @@ TEST_CASE("DoneMessageReceivedShouldAdd", "CoibaseFeedTest") {
     OrderBook orderbook;
     listener.productChanges[0]->updateOrderBook(&orderbook);
     listener.productChanges[1]->updateOrderBook(&orderbook);
+    REQUIRE(orderbook.getBids().size() == 0);
+    REQUIRE(orderbook.getAsks().size() == 1);
+}
+
+
+TEST_CASE("DoneMessageReceivedShouldAddAsMerged", "CoibaseFeedTest") {
+    std::string clientId = "1";
+    std::string prodId = "ETH-USD";
+
+    RestTransport::bids.push_back(Order{1.1, 100, "OrderNb1"});
+    RestTransport::asks.push_back(Order{1.1, 100, "OrderNb2"});
+    RestTransport::request_time_in_ms = 2000;
+    ProductListener listener;
+    {
+      CoinbaseFeedClient client;
+      client.subscribe(prodId, &listener);
+      auto start = std::chrono::high_resolution_clock::now();
+      std::this_thread::sleep_for(100ms);
+
+      client.onMessageReceived(doneMsg(prodId, clientId, "sell", "OrderNb1", 2));
+      std::this_thread::sleep_for(100ms);
+    }
+    REQUIRE(listener.productChanges.size() == 1); // full orderbook msg with full orderbook and done message
+
+    OrderBook orderbook;
+    listener.productChanges[0]->updateOrderBook(&orderbook);
     REQUIRE(orderbook.getBids().size() == 0);
     REQUIRE(orderbook.getAsks().size() == 1);
 }

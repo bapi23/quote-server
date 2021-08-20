@@ -80,9 +80,7 @@ public:
     }
 
     void unsubscribe(const std::string& clientId, const std::string& prodId) override {
-        std::cout << "DUPA1" << std::endl;
         std::lock_guard<std::mutex> lg(marketDataMutex);
-        std::cout << "DUPA2" << std::endl;
         std::cout << "Unsubscribing client " << clientId << " from " << prodId;
         auto it = m_products.find(prodId);
         if(it != m_products.end()){
