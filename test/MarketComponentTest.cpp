@@ -6,6 +6,7 @@
 #include "Market.hpp"
 #include "ProductChangePublisherFactoryMock.hpp"
 #include "product/ProductChangeResetOrderBook.hpp"
+#include "product/ProductChangeDone.hpp"
 
 #include "FeedClientSpy.hpp"
 

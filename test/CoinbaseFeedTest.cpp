@@ -1,5 +1,6 @@
 #define CATCH_CONFIG_MAIN
 #include <iostream>
+#include <thread>
 #include <vector>
 
 #include "catch2/catch.hpp"
@@ -7,7 +8,9 @@
 
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "RestTransport.hpp"
+#include "OrderBook.hpp"
 
+using namespace std::chrono_literals;
 
 
 std::string generateMsg(const std::string& type,
@@ -15,20 +18,24 @@ std::string generateMsg(const std::string& type,
                      const std::string& clientId,
                      const std::string& size,
                      const std::string& price,
-                     const std::string& seq){
+                     const std::string& side,
+                     const std::string& orderId,
+                     const long unsigned seq){
   nlohmann::json msg {
     {"type", type},
     {"product_id", prodId},
+    {"order_id", orderId},
     {"client_id", clientId},
     {"size", size},
     {"price", price},
-    {"sequence", seq}
+    {"sequence", seq},
+    {"side", side}
   };
   return msg.dump();
 }
 
-std::string doneMsg(const std::string& prodId, const std::string& clientId, long int seq){
-  return generateMsg("done", prodId, clientId, "100", "100", std::to_string(seq));
+std::string doneMsg(const std::string& prodId, const std::string& clientId, const std::string& side, const std::string& orderId, long unsigned seq){
+  return generateMsg("done", prodId, clientId, "100", "100", side, orderId, seq);
 }
 
 class ProductListener: public ProductChangeListener{
@@ -52,7 +59,17 @@ TEST_CASE("DoneMessageReceivedShouldAdd", "CoibaseFeedTest") {
     {
       CoinbaseFeedClient client;
       client.subscribe(prodId, &listener);
-      client.onMessageReceived(doneMsg(prodId, clientId, 123));
+      auto start = std::chrono::high_resolution_clock::now();
+      std::this_thread::sleep_for(100ms);
+
+      client.onMessageReceived(doneMsg(prodId, clientId, "sell", "OrderNb1", 2));
+      std::this_thread::sleep_for(100ms);
     }
-    REQUIRE(listener.productChanges.size() == 2); // full orderbook msg + done
+    REQUIRE(listener.productChanges.size() == 2); // full orderbook msg with full orderbook and done message
+
+    OrderBook orderbook;
+    listener.productChanges[0]->updateOrderBook(&orderbook);
+    listener.productChanges[1]->updateOrderBook(&orderbook);
+    REQUIRE(orderbook.getBids().size() == 0);
+    REQUIRE(orderbook.getAsks().size() == 1);
 }

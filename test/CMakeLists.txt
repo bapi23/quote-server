@@ -1,7 +1,12 @@
 
 cmake_minimum_required(VERSION 3.10)
 
-add_executable(MarketComponentTest MarketComponentTest.cpp ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp)
+add_executable(MarketComponentTest MarketComponentTest.cpp 
+                    ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp 
+                    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
+                    ${PROJECT_SOURCE_DIR}/src/Order.cpp
+                    ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp)
+
 target_include_directories(MarketComponentTest 
                             PRIVATE 
                                 ${PROJECT_SOURCE_DIR}/ext/websocketpp 
@@ -10,7 +15,10 @@ target_include_directories(MarketComponentTest
                                 ${PROJECT_SOURCE_DIR}/include
                                 transport)
 
-target_link_libraries (MarketComponentTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+target_link_libraries (MarketComponentTest 
+                            ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} 
+                            nlohmann_json::nlohmann_json curlpp)
+                            
 set_property(TARGET MarketComponentTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(MarketComponentTest PROPERTIES
@@ -18,7 +26,12 @@ set_target_properties(MarketComponentTest PROPERTIES
             CXX_EXTENSIONS OFF
             )
 
-add_executable(CoibaseFeedTest CoinbaseFeedTest.cpp ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp)
+add_executable(CoibaseFeedTest CoinbaseFeedTest.cpp 
+                                ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp
+                                ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
+                                ${PROJECT_SOURCE_DIR}/src/Order.cpp
+                                ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp)
+                                
 target_include_directories(CoibaseFeedTest 
                             PRIVATE 
                                 ${PROJECT_SOURCE_DIR}/ext/websocketpp 

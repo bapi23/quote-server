@@ -36,9 +36,7 @@ public:
 
     void onMessageReceived(const nlohmann::json& message) {
         std::unique_lock<std::mutex> lk(m_messagesMutex);
-        unsigned long int sequence = 0;
-        std::string sequenceStr = message["sequence"].get<std::string>();
-        std::stringstream(sequenceStr) >> sequence;
+        unsigned long  sequence = message["sequence"].get<unsigned long>();
 
         if(m_requestingOrderbook){
             m_messageQueue.push_back(message);
@@ -88,9 +86,7 @@ private:
                 return;
             }
 
-            unsigned long int orderBookSequence = 0;
-            std::string sequenceStr = orderBookMsg["sequence"].get<std::string>();
-            std::stringstream(sequenceStr) >> orderBookSequence;
+            long unsigned orderBookSequence = orderBookMsg["sequence"].get<long unsigned>();
 
             if(orderBookSequence == 0){
                 std::cout << "[" << m_productId << "]" << "INVALID ORDERBOOK SEQUENCE" << std::endl;
@@ -105,9 +101,7 @@ private:
                     auto message = m_messageQueue.front();
                     m_messageQueue.pop_front();
                     if(message.contains("sequence")){
-                        unsigned long int sequence = 0;
-                        std::string sequenceStr = message["sequence"].get<std::string>();
-                        std::stringstream(sequenceStr) >> sequence;
+                        unsigned long int sequence = message["sequence"].get<long unsigned>();
                         //std::cout << "Msg sequence" << sequence << std::endl;
                         if(sequence > orderBookSequence){
                             m_lastSequenceNumber = sequence;
