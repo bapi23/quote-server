@@ -1,4 +1,3 @@
-#pragma once
 
 #include <sstream>
 #include <vector>
@@ -10,6 +9,7 @@
 #include <curlpp/Options.hpp>
 #include <curlpp/Exception.hpp>
 
+#include "RestTransport.hpp"
 #include "Order.hpp"
 
 using namespace std::chrono_literals;
@@ -28,28 +28,20 @@ void from_json(const nlohmann::json& j, Order& o) {
     j[0].get_to(o.price);
 }
 
-class RestTransport{
-public:
-    static std::string request(const std::string& address){
-        nlohmann::json message;
+std::string RestTransport::request(const std::string& address){
+    nlohmann::json message;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(request_time_in_ms));
+    std::this_thread::sleep_for(std::chrono::milliseconds(request_time_in_ms));
 
-        message["sequence"] = 1;
-        for(const auto& bid: bids){
-            message["bids"].push_back(bid);
-        }
-        for(const auto& ask: asks){
-            message["asks"].push_back(ask);
-        }
-        return message.dump();
+    message["sequence"] = 1;
+    for(const auto& bid: bids){
+        message["bids"].push_back(bid);
     }
-
-    static int sequence;
-    static std::vector<Order> bids;
-    static std::vector<Order> asks;
-    static int request_time_in_ms;
-};
+    for(const auto& ask: asks){
+        message["asks"].push_back(ask);
+    }
+    return message.dump();
+}
 
 int RestTransport::sequence = 1;
 int RestTransport::request_time_in_ms = 2000;

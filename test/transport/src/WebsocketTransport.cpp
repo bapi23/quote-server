@@ -1,4 +1,3 @@
-#pragma once
 
 #include <unordered_map>
 #include <string>
@@ -9,6 +8,7 @@
 #include <websocketpp/common/memory.hpp>
 #include <iostream>
 
+#include "WebsocketTransport.hpp"
 #include "MessageReceiver.hpp"
 
 typedef websocketpp::client<websocketpp::config::asio_tls_client> websocket_client;
@@ -17,22 +17,17 @@ using websocketpp::lib::placeholders::_2;
 using websocketpp::lib::bind;
 
 
-class WebsocketTransport{
-public:
-    void connect(const std::string& uri){
-    }
 
-    void send(const std::string& msg){
-    }
+void WebsocketTransport::connect(const std::string& uri){
+}
 
-    void subscribe(const std::string& id, MessageReceiver* receiver){
-        subscribers[id] = receiver;
-    }
+void WebsocketTransport::send(const std::string& msg){
+}
 
-    void unsubscribe(const std::string& id){
-        subscribers.erase(id);
-    }
+void WebsocketTransport::subscribe(const std::string& id, MessageReceiver* receiver){
+    subscribers[id] = receiver;
+}
 
-private:
-    std::unordered_map<std::string, MessageReceiver*> subscribers;
-};
+void WebsocketTransport::unsubscribe(const std::string& id){
+    subscribers.erase(id);
+}

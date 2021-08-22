@@ -1,11 +1,23 @@
 
 cmake_minimum_required(VERSION 3.10)
 
+
+set(SOURCE
+    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
+    ${PROJECT_SOURCE_DIR}/src/Order.cpp
+    ${PROJECT_SOURCE_DIR}/src/Market.cpp
+    ${PROJECT_SOURCE_DIR}/src/OrderBook.cpp
+    ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp
+    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedListener.cpp
+    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedClient.cpp
+    ${PROJECT_SOURCE_DIR}/test/transport/src/RestTransport.cpp
+    ${PROJECT_SOURCE_DIR}/test/transport/src/WebsocketTransport.cpp
+    ${PROJECT_SOURCE_DIR}/src/utils/uuid.cpp
+)
+
 add_executable(MarketComponentTest MarketComponentTest.cpp 
                     ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp 
-                    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
-                    ${PROJECT_SOURCE_DIR}/src/Order.cpp
-                    ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp)
+                    ${SOURCE})
 
 target_include_directories(MarketComponentTest 
                             PRIVATE 
@@ -13,7 +25,7 @@ target_include_directories(MarketComponentTest
                                 ${PROJECT_SOURCE_DIR}/ext/curlpp/include 
                                 ${PROJECT_SOURCE_DIR}/ext/catch2/  
                                 ${PROJECT_SOURCE_DIR}/include
-                                transport)
+                                transport/include)
 
 target_link_libraries (MarketComponentTest 
                             ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} 
@@ -28,9 +40,7 @@ set_target_properties(MarketComponentTest PROPERTIES
 
 add_executable(CoibaseFeedTest CoinbaseFeedTest.cpp 
                                 ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp
-                                ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
-                                ${PROJECT_SOURCE_DIR}/src/Order.cpp
-                                ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp)
+                                ${SOURCE})
                                 
 target_include_directories(CoibaseFeedTest 
                             PRIVATE 
@@ -38,7 +48,7 @@ target_include_directories(CoibaseFeedTest
                                 ${PROJECT_SOURCE_DIR}/ext/curlpp/include 
                                 ${PROJECT_SOURCE_DIR}/ext/catch2/ 
                                 ${PROJECT_SOURCE_DIR}/include
-                                transport)
+                                transport/include)
 
 target_link_libraries (CoibaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
 set_property(TARGET CoibaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
