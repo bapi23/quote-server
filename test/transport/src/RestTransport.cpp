@@ -43,6 +43,11 @@ std::string RestTransport::request(const std::string& address){
     return message.dump();
 }
 
+void RestTransport::clear(){
+    bids.clear();
+    asks.clear();
+}
+
 int RestTransport::sequence = 1;
 int RestTransport::request_time_in_ms = 2000;
 std::vector<Order> RestTransport::bids;

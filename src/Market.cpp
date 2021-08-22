@@ -25,6 +25,13 @@ Market::Market(std::unique_ptr<FeedClient> feedClient,
 {
 }
 
+Market::~Market(){
+    isRunning = false;
+    if(m_productChangeHandlerThread.joinable()){
+        m_productChangeHandlerThread.join();
+    }
+}
+
 void Market::onProductChange(std::unique_ptr<ProductChange> pc)
 {
     {
@@ -35,11 +42,12 @@ void Market::onProductChange(std::unique_ptr<ProductChange> pc)
 }
 
 void Market::processProductChanges(){
+    using namespace std::chrono_literals;
     while(isRunning){
         std::deque<std::unique_ptr<ProductChange>> currentChanges;
         {
             std::unique_lock<std::mutex> lk1(productChangeHandlerMutex);
-            productChangeCv.wait(lk1, [this]{return !productChanges.empty();});
+            productChangeCv.wait_for(lk1, 100ms, [this]{return !productChanges.empty();});
             currentChanges = std::move(productChanges);
             productChanges.clear();
         }

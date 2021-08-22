@@ -2,14 +2,15 @@
 
 #include "FeedClient.hpp"
 #include <unordered_map>
+#include "product/ProductChangeListener.hpp"
 
 class FeedClientSpy: public FeedClient
 {
 public:
-    virtual void subscribe(const std::string& product_id, ProductChangeListener* listener){
+    virtual void subscribe(const std::string& product_id, ProductChangeListener* listener) override{
         m_listeners[product_id] = listener;
     }
-    virtual void unsubscribe(const std::string& product_id){
+    virtual void unsubscribe(const std::string& product_id) override {
         m_listeners.erase(product_id);
     }
 

@@ -19,6 +19,7 @@ class Market: public ProductSubscriber, ProductChangeListener{
 public:
     Market(std::unique_ptr<FeedClient> feedClient, 
            std::unique_ptr<ProductChangePublisherFactory> publisherFactory);
+    ~Market();
 
     void onProductChange(std::unique_ptr<ProductChange> pc) override;
     void processProductChanges();

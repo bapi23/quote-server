@@ -21,7 +21,7 @@ void from_json(const nlohmann::json& j, Order& o);
 class RestTransport{
 public:
     static std::string request(const std::string& address);
-
+    static void clear();
     static int sequence;
     static std::vector<Order> bids;
     static std::vector<Order> asks;
