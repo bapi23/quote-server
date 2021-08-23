@@ -8,16 +8,26 @@ set(SOURCE
     ${PROJECT_SOURCE_DIR}/src/Market.cpp
     ${PROJECT_SOURCE_DIR}/src/OrderBook.cpp
     ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp
-    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedListener.cpp
+    ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedProduct.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedClient.cpp
+
+    ${PROJECT_SOURCE_DIR}/src/utils/uuid.cpp
+)
+
+set(TEST_TRANSPORT_SOURCE
     ${PROJECT_SOURCE_DIR}/test/transport/src/RestTransport.cpp
     ${PROJECT_SOURCE_DIR}/test/transport/src/WebsocketTransport.cpp
-    ${PROJECT_SOURCE_DIR}/src/utils/uuid.cpp
+)
+
+set(REAL_TRANSPORT_SOURCE
+    ${PROJECT_SOURCE_DIR}/transport/src/RestTransport.cpp
+    ${PROJECT_SOURCE_DIR}/transport/src/WebsocketTransport.cpp
 )
 
 add_executable(MarketComponentTest MarketComponentTest.cpp 
                     ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp 
-                    ${SOURCE})
+                    ${SOURCE}
+                    ${TEST_TRANSPORT_SOURCE})
 
 target_include_directories(MarketComponentTest 
                             PRIVATE 
@@ -40,7 +50,8 @@ set_target_properties(MarketComponentTest PROPERTIES
 
 add_executable(CoibaseFeedTest CoinbaseFeedTest.cpp 
                                 ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp
-                                ${SOURCE})
+                                ${SOURCE}
+                                ${TEST_TRANSPORT_SOURCE})
                                 
 target_include_directories(CoibaseFeedTest 
                             PRIVATE 
@@ -54,6 +65,29 @@ target_link_libraries (CoibaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENS
 set_property(TARGET CoibaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(CoibaseFeedTest PROPERTIES
+            CXX_STANDARD 17
+            CXX_EXTENSIONS OFF
+            )
+
+
+add_executable(RealCoinbaseFeedTest RealCoinbaseFeedTest.cpp 
+                                ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp
+                                ${PROJECT_SOURCE_DIR}/src/
+                                ${SOURCE}
+                                ${REAL_TRANSPORT_SOURCE})
+                                
+target_include_directories(RealCoinbaseFeedTest 
+                            PRIVATE 
+                                ${PROJECT_SOURCE_DIR}/ext/websocketpp 
+                                ${PROJECT_SOURCE_DIR}/ext/curlpp/include 
+                                ${PROJECT_SOURCE_DIR}/ext/catch2/ 
+                                ${PROJECT_SOURCE_DIR}/include
+                                ${PROJECT_SOURCE_DIR}/transport/include)
+
+target_link_libraries (RealCoinbaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+set_property(TARGET RealCoinbaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
+
+set_target_properties(RealCoinbaseFeedTest PROPERTIES
             CXX_STANDARD 17
             CXX_EXTENSIONS OFF
             )

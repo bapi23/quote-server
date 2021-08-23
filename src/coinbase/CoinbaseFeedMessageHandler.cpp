@@ -47,7 +47,6 @@ std::unique_ptr<ProductChange> CoinbaseFeedMessageHandler::getProductChange(cons
         std::vector<std::unique_ptr<ProductChange>> toMerge;
         if(jmsg.contains("to_merge")){
             for(const auto& msg: jmsg["to_merge"]){
-                std::cout << msg;
                 auto pc = getProductChange(msg);
                 if(pc){
                     toMerge.push_back(std::move(pc));
@@ -55,39 +54,42 @@ std::unique_ptr<ProductChange> CoinbaseFeedMessageHandler::getProductChange(cons
             }
         }
         std::cout << "Product changes to merge " << toMerge.size() << std::endl;
-        pc = std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::move(toMerge), m_productId);
+        long unsigned sequence = jmsg["sequence"].get<long unsigned>();
+        pc = std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::move(toMerge), m_productId, sequence);
     } else if (jmsg.contains("type")) {
         if(jmsg["type"].get<std::string>() == "open"){
             const std::string orderId = jmsg["order_id"].get<std::string>();
+            long unsigned sequence = jmsg["sequence"].get<long unsigned>();
             const std::string price = jmsg["price"].get<std::string>();
             const std::string size = jmsg["remaining_size"].get<std::string>();
             const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
-            pc = std::make_unique<ProductChangeOpen>(orderId, std::stod(price), std::stod(size), side, m_productId);
+            pc = std::make_unique<ProductChangeOpen>(orderId, std::stod(price), std::stod(size), side, m_productId, sequence);
         } else if (jmsg["type"].get<std::string>() == "done") {
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << jmsg["order_id"].get<std::string>() << std::endl;
-            std::cout << jmsg;
             const std::string orderId = jmsg["order_id"].get<std::string>();
-            std::cout << jmsg;
             const std::string sideStr =  jmsg["side"].get<std::string>();
             const Side side = sideStr == "sell"? Side::Sell: Side::Buy;
-            pc = std::make_unique<ProductChangeDone>(orderId, side, m_productId);
+            long unsigned sequence = jmsg["sequence"].get<long unsigned>();
+            pc = std::make_unique<ProductChangeDone>(orderId, side, m_productId, sequence);
         } else if (jmsg["type"].get<std::string>() == "match") {
             const std::string makerOrderId = jmsg["maker_order_id"].get<std::string>();
             const std::string takerOrderId = jmsg["taker_order_id"].get<std::string>();
+            long unsigned sequence = jmsg["sequence"].get<long unsigned>();
             const std::string price = jmsg["price"].get<std::string>();
             const std::string size = jmsg["size"].get<std::string>();
             const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " maker id: " << makerOrderId << " taker id: " << takerOrderId <<std::endl;
-            pc = std::make_unique<ProductChangeMatch>(makerOrderId, takerOrderId, std::stod(price), std::stod(size), side, m_productId);
+            pc = std::make_unique<ProductChangeMatch>(makerOrderId, takerOrderId, std::stod(price), std::stod(size), side, m_productId, sequence);
 
         } else if (jmsg["type"].get<std::string>() == "change") {
             const std::string orderId = jmsg["order_id"].get<std::string>();
             const std::string price = jmsg["price"].get<std::string>();
             const std::string size = jmsg["size"].get<std::string>();
+            long unsigned sequence = jmsg["sequence"].get<long unsigned>();
             const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
-            pc = std::make_unique<ProductChangeChange>(orderId, std::stod(price), std::stod(size), side, m_productId);
+            pc = std::make_unique<ProductChangeChange>(orderId, std::stod(price), std::stod(size), side, m_productId, sequence);
         } else if (jmsg["type"].get<std::string>() == "ticker") {
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: "  << std::endl;
             //TODO

@@ -7,7 +7,7 @@
 #include "ProductChangePublisherFactoryMock.hpp"
 #include "product/ProductChangeResetOrderBook.hpp"
 #include "product/ProductChangeDone.hpp"
-
+#include "GenerateTestData.hpp"
 #include "FeedClientSpy.hpp"
 
 using namespace std::chrono_literals;
@@ -38,7 +38,7 @@ TEST_CASE("ProductShouldPublishFullOrderbook", "MarketTest") {
     std::vector<Order> bids = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     std::vector<Order> asks = {Order{4.3, 4.5, "1"}, Order{4.3, 4.5, "2"}};
     auto prodChangReq = 
-            std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD");
+            std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD", 2);
     ProductChangePublisherFactoryMock* publisherFactoryPtr = publisherFactory.get();
     {
         Market market(std::move(feed), std::move(publisherFactory));
@@ -66,10 +66,31 @@ TEST_CASE("ProductShouldPublishTrade", "MarketTest") {
     REQUIRE(feedPtr->m_listeners.size() == 1);
 
     auto prodChangReq = 
-        std::make_unique<ProductChangeDone>("order_id", Side::Buy, "ETH-USD");
+        std::make_unique<ProductChangeDone>("order_id", Side::Buy, "ETH-USD", 2);
     feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_trades.size() == 1);
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_trades[0]->generateMessage() != "");
+}
+
+
+TEST_CASE("PerformanceTest", "MarketTest") {
+    auto feed = std::make_unique<FeedClientSpy>();
+    FeedClientSpy* feedPtr = feed.get();
+    std::unique_ptr<ProductChangePublisherFactoryMock> publisherFactory = 
+                            std::make_unique<ProductChangePublisherFactoryMock>();
+    std::vector<Order> bids = generateData(1, 10000);
+    std::vector<Order> asks = generateData(1001, 10000);
+    auto prodChangReq = 
+            std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD", 2);
+    ProductChangePublisherFactoryMock* publisherFactoryPtr = publisherFactory.get();
+    {
+        Market market(std::move(feed), std::move(publisherFactory));
+        market.subscribe("clientId", "ETH-USD");
+        REQUIRE(feedPtr->m_listeners.size() == 1);
+        feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
+        for(auto& change: generateProductChanges(1, "ETH-USD", 10000))
+            feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(change));
+    }
 }

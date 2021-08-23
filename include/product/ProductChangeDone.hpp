@@ -22,8 +22,9 @@ public:
 
     ProductChangeDone(const std::string& orderId,
                        Side side,
-                      std::string productId):
-                ProductChange(productId),
+                      std::string productId,
+                      unsigned long sequenceNumber):
+                ProductChange(productId, sequenceNumber),
                 m_orderId(orderId),
                 m_side(side)
 

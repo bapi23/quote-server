@@ -32,7 +32,7 @@ WebsocketTransport::WebsocketTransport(){
 }
 
 WebsocketTransport::~WebsocketTransport(){
-    m_thread->join();
+    //m_thread->join();
 }
 
 void WebsocketTransport::connect(const std::string& uri){
@@ -48,6 +48,7 @@ void WebsocketTransport::connect(const std::string& uri){
 
     m_client.get_alog().write(websocketpp::log::alevel::app, "Connecting to " + uri);
     m_thread.reset(new websocketpp::lib::thread(&websocket_client::run, &m_client));
+    m_thread->detach();
     sleep(1); // TODO fix with queuing messages to send!
 }
 

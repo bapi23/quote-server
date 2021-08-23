@@ -16,10 +16,10 @@
 
 using json = nlohmann::json;
 
-class CoinbaseFeedListener{
+class CoinbaseFeedProduct{
 public:
-    CoinbaseFeedListener(const std::string productId, ProductChangeListener* listener);
-    ~CoinbaseFeedListener();
+    CoinbaseFeedProduct(const std::string productId, ProductChangeListener* listener);
+    ~CoinbaseFeedProduct();
 
     void requestFullOrderBook();
     void onMessageReceived(const nlohmann::json& message);
@@ -28,10 +28,10 @@ private:
     void requestFullOrderBookImpl();
     void messageLoop();
 
-    CoinbaseFeedListener(CoinbaseFeedListener&& other) = delete;
-    CoinbaseFeedListener& operator=(CoinbaseFeedListener&& other) = delete;
-    CoinbaseFeedListener(CoinbaseFeedListener&) = delete;
-    CoinbaseFeedListener& operator=(CoinbaseFeedListener&) = delete;
+    CoinbaseFeedProduct(CoinbaseFeedProduct&& other) = delete;
+    CoinbaseFeedProduct& operator=(CoinbaseFeedProduct&& other) = delete;
+    CoinbaseFeedProduct(CoinbaseFeedProduct&) = delete;
+    CoinbaseFeedProduct& operator=(CoinbaseFeedProduct&) = delete;
 
 private:
     std::string m_productId;

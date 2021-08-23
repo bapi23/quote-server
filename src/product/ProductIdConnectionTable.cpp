@@ -1,5 +1,6 @@
 #include <unordered_map>
 
+#include "RestTransport.hpp"
 namespace transport{
     std::unordered_map<std::string, std::string> prodIdToPort = {
         {"ETH-USD", "8000"},

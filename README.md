@@ -1,6 +1,6 @@
-#QOS Server implementation
+#QS Server implementation
 
-QOS Server can be used mainly to obtain data from the Coinbase pro api. It might be also extended with other APIs
+QS Server can be used mainly to obtain data from the Coinbase pro api. It might be also extended with other APIs
 The main purpose of the project is to obtain feed data in fast and reliable way.
 
 
@@ -55,10 +55,19 @@ client --prod-ids sub ETH-USD 1 unsub ETH-USD 10 --server-endpoint tcp://127.0.0
 ## Implementation documentation
 Implementation documentation and message definitions + workflow can be found inside doc folder.
 
-#
-#
 ##### TODO list
-- Change message received format inside CoinbaseFeedListener to json
-- Add sources to speed up compilation
+- implement dynamic endpoint allocation with the usage of https://api.pro.coinbase.com/products/
 - Implement subscription confirmation between FeedClient and ClientRegister
-- Merge full order with feed messages to get better performance here: include/coinbase/CoinbaseFeedListener.hpp:50
+
+
+#### Things to discuss:
+1. Scaling:
+
+- Current Implementation should be splitted. ClientService shouild be a load balancing separated service and provide endpoints which are best fit for the client based on network latency, servers occupation, existing connections for product ids etc.
+
+- There should be another service which is capable of starting new server nodes (also for the same product ids) if all other are occpied heavily. Client Service should be able to request a new node for the client or bypass it to another node if current one is unstable/have low performance.
+
+2. Latency
+
+- Tests can be used to measure how system will behave under high load.
+- Metrics should be used to determine messages frequency and delays between components (based on time stamps)

@@ -9,6 +9,8 @@
 #include <condition_variable>
 #include <chrono>
 #include <functional>
+#include <boost/circular_buffer.hpp>
+
 
 #include <boost/program_options.hpp>
 
@@ -40,20 +42,7 @@ std::string clientId;
 
 std::queue<ScenarioEntry> scenario;
 
-
-void handleScenario(){
-    while(!scenario.empty()){
-        ScenarioEntry entry = scenario.front();
-        scenario.pop();
-
-        std::this_thread::sleep_for(std::chrono::seconds(entry.timeInS));
-        {
-            std::unique_lock<std::mutex> lk(mutexScenario);
-            scenarioMessagesQueue.push(entry);
-        }
-        cvScenario.notify_one();
-    }
-}
+boost::circular_buffer<std::chrono::steady_clock::time_point> stamps(100);
 
 void handleFeedMessages(){
     std::chrono::steady_clock::time_point lastTime;
@@ -81,6 +70,34 @@ void handleFeedMessages(){
              }
         }
     }
+}
+
+void handleScenario(){
+    while(!scenario.empty()){
+        ScenarioEntry entry = scenario.front();
+        scenario.pop();
+
+        std::this_thread::sleep_for(std::chrono::seconds(entry.timeInS));
+        {
+            std::unique_lock<std::mutex> lk(mutexScenario);
+            scenarioMessagesQueue.push(entry);
+        }
+        cvScenario.notify_one();
+    }
+}
+
+std::queue<ScenarioEntry> transform(const std::vector<std::string>& vec){
+    std::queue<ScenarioEntry> out;
+    for(int i = 0; i < vec.size(); i+=3){
+        std::cout << vec[i] << std::endl;
+        std::cout << vec[i+1] << std::endl;
+        std::cout << vec[i+2] << std::endl;
+        bool subscribe = vec[i] == "sub"? true: false;
+        std::string productId = vec[i+1];
+        int timeInS = std::stoi(vec[i+2]);
+        out.push(ScenarioEntry{subscribe, productId, timeInS});
+    }
+    return out;
 }
 
 void hendleNewEndpoints(){
@@ -123,6 +140,21 @@ void hendleNewEndpoints(){
                     }
                     auto data = std::string(static_cast<char*>(message.data()), message.size());
                     {
+                        const auto jmsg = nlohmann::json::parse(data);
+                        if(jmsg.contains("data")){
+                            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+                            stamps.push_back(begin);
+
+                            if(stamps.size() > 0){
+                                auto last = stamps.back();
+                                auto first = stamps.front();
+                                auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
+                                auto messages_per_second = boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(stamps.size()) * 1000;
+                                std::cout << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
+                                // Send metrics
+                            }
+                        }
+
                         std::unique_lock<std::mutex> lk(mutexFeedMessages);
                         feedMessagesQueue.push(data);
                     }
@@ -139,20 +171,6 @@ void hendleNewEndpoints(){
             (*endpointToHandler[endpoint]).store(false);
         }
     }
-}
-
-std::queue<ScenarioEntry> transform(const std::vector<std::string>& vec){
-    std::queue<ScenarioEntry> out;
-    for(int i = 0; i < vec.size(); i+=3){
-        std::cout << vec[i] << std::endl;
-        std::cout << vec[i+1] << std::endl;
-        std::cout << vec[i+2] << std::endl;
-        bool subscribe = vec[i] == "sub"? true: false;
-        std::string productId = vec[i+1];
-        int timeInS = std::stoi(vec[i+2]);
-        out.push(ScenarioEntry{subscribe, productId, timeInS});
-    }
-    return out;
 }
 
 int main(int argc, char **argv){
@@ -256,28 +274,29 @@ int main(int argc, char **argv){
         {
             std::unique_lock<std::mutex> lk(mutexScenario);
             cvScenario.wait_for(lk, 10ms, []{return !scenarioMessagesQueue.empty();});
-            if(!scenarioMessagesQueue.empty()){
+            if(!scenarioMessagesQueue.empty())
+            {
                 auto scenarioEntry = scenarioMessagesQueue.front();
                 scenarioMessagesQueue.pop();
 
                 std::cout << "sending scenario message: " << response;
                 
-            nlohmann::json jmessage;
-            if(scenarioEntry.subscribe){
-                jmessage =
-                {{"type", "subscribe_request"},
-                {"client_id", clientId},
-                {"product_id", scenarioEntry.productId}
-                };
-            } else {
-                jmessage =
-                {{"type", "unsubscribe_request"},
-                {"client_id", clientId},
-                {"product_id", scenarioEntry.productId}
-                };
-            }
+                nlohmann::json jmessage;
+                if(scenarioEntry.subscribe){
+                    jmessage =
+                    {{"type", "subscribe_request"},
+                    {"client_id", clientId},
+                    {"product_id", scenarioEntry.productId}
+                    };
+                } else {
+                    jmessage =
+                    {{"type", "unsubscribe_request"},
+                    {"client_id", clientId},
+                    {"product_id", scenarioEntry.productId}
+                    };
+                }
 
-            response = jmessage.dump();
+                response = jmessage.dump();
             }
         }
         if(response.empty()){ // no scenario message

@@ -5,34 +5,34 @@
 #include <nlohmann/json.hpp>
 
 
-#include "coinbase/CoinbaseFeedListener.hpp"
+#include "coinbase/CoinbaseFeedProduct.hpp"
 #include "coinbase/CoinbaseFeedMessageHandler.hpp"
 #include "WebsocketTransport.hpp"
 #include "RestTransport.hpp"
 #include "MessageReceiver.hpp"
 
 
-CoinbaseFeedListener::CoinbaseFeedListener(const std::string productId, ProductChangeListener* listener): 
+CoinbaseFeedProduct::CoinbaseFeedProduct(const std::string productId, ProductChangeListener* listener): 
     m_productId(productId), 
     m_msgHandler(listener, productId), 
     m_messageQueue(), 
     m_lastSequenceNumber(0)
 {
     std::cout << "[" << m_productId << "]" << "Requesting full orderbook" << std::endl;
-    m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)));
-    m_messageHandlerThread.reset(new std::thread(std::bind(&CoinbaseFeedListener::messageLoop, this)));
+    m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedProduct::requestFullOrderBookImpl, this)));
+    m_messageHandlerThread.reset(new std::thread(std::bind(&CoinbaseFeedProduct::messageLoop, this)));
 }
 
-void CoinbaseFeedListener::requestFullOrderBook(){
+void CoinbaseFeedProduct::requestFullOrderBook(){
     m_requestingOrderbook = true;
     if(m_fullOrderBookRequestThread && m_fullOrderBookRequestThread->joinable()){
         m_fullOrderBookRequestThread->join();
     }
     std::cout << "[" << m_productId << "]" << "Requesting full orderbook" << std::endl;
-    m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedListener::requestFullOrderBookImpl, this)));
+    m_fullOrderBookRequestThread.reset(new std::thread(std::bind(&CoinbaseFeedProduct::requestFullOrderBookImpl, this)));
 }
 
-void CoinbaseFeedListener::onMessageReceived(const nlohmann::json& message) {
+void CoinbaseFeedProduct::onMessageReceived(const nlohmann::json& message) {
     std::unique_lock<std::mutex> lk(m_messagesMutex);
     unsigned long  sequence = message["sequence"].get<unsigned long>();
 
@@ -41,21 +41,21 @@ void CoinbaseFeedListener::onMessageReceived(const nlohmann::json& message) {
         return;
     }
     if( sequence > m_lastSequenceNumber + 1){
-        std::cout << "[" << m_productId << "]" << "Received gap between message" << m_lastSequenceNumber << " vs " << sequence << std::endl;
+        //std::cout << "[" << m_productId << "]" << "Received gap between message" << m_lastSequenceNumber << " vs " << sequence << std::endl;
         m_lastSequenceNumber = 0;
         requestFullOrderBook();
     } else if (sequence <= m_lastSequenceNumber){
-        std::cout << "[" << m_productId << "]" << "Received too old message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
+        //std::cout << "[" << m_productId << "]" << "Received too old message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
         return;
     } else {
-        std::cout << "[" << m_productId << "]" << "Received up-to-date message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
+        //std::cout << "[" << m_productId << "]" << "Received up-to-date message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
         m_messageQueue.push_back(message);
         m_lastSequenceNumber = sequence;
         m_messages_cv.notify_one();
     }
 }
 
-CoinbaseFeedListener::~CoinbaseFeedListener(){
+CoinbaseFeedProduct::~CoinbaseFeedProduct(){
     if(m_fullOrderBookRequestThread && m_fullOrderBookRequestThread->joinable()){
         m_fullOrderBookRequestThread->join();
     }
@@ -65,7 +65,7 @@ CoinbaseFeedListener::~CoinbaseFeedListener(){
     }
 }
 
-void CoinbaseFeedListener::requestFullOrderBookImpl(){
+void CoinbaseFeedProduct::requestFullOrderBookImpl(){
 
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     
@@ -119,7 +119,7 @@ void CoinbaseFeedListener::requestFullOrderBookImpl(){
     }
 }
 
-void CoinbaseFeedListener::messageLoop(){
+void CoinbaseFeedProduct::messageLoop(){
     while(m_isRunning){
         using namespace std::chrono_literals;
         std::deque<nlohmann::json> messages;
@@ -132,7 +132,7 @@ void CoinbaseFeedListener::messageLoop(){
             }
         }
         for(const auto& msg: messages){
-            std::cout << "Handling for " << m_productId << std::endl;
+            //std::cout << "Handling for " << m_productId << std::endl;
             m_msgHandler.onMessageReceived(msg);
         }
     }

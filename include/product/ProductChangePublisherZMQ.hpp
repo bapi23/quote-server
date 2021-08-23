@@ -5,6 +5,7 @@
 #include <zmq_addon.hpp>
 #include <nlohmann/json.hpp>
 #include <atomic>
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "ProductIdConnectionTable.hpp"
 #include "product/ProductChangePublisher.hpp"
@@ -27,7 +28,8 @@ public:
     ProductChangePublisherZMQ(const std::string& productId):
         m_ctx(),
         m_sock(m_ctx, zmq::socket_type::pub),
-        m_productId(productId)
+        m_productId(productId),
+        m_stamps(2000)
         {
             if(productId.find(productId))
                 throw std::runtime_error("Can't find product id in connection map!");
@@ -36,11 +38,18 @@ public:
         }
 
     void publish(OrderBookView* view){
-        std::chrono::steady_clock::time_point newTime = std::chrono::steady_clock::now();
-        auto difference = std::chrono::duration_cast<std::chrono::microseconds>(newTime - lastTime).count();
-        lastTime = newTime;
+        // std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        // m_stamps.push_back(begin);
+        // if(m_stamps.size() > 0){
+        //     auto last = m_stamps.back();
+        //     auto first = m_stamps.front();
+        //     auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
+        //     auto messages_per_second = boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(m_stamps.size()) * 1000;
+        //     std::cout << "[" << m_productId << "] " << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
+        //     // Send metrics
+        // }
 
-        //std::cout << "frequency = " << 1.0f/(float(difference)/1000000.0f) << "[Hz]" << std::endl;
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
         nlohmann::json jmessage = {
             {"asks", {}},
             {"bids", {}},
@@ -58,8 +67,11 @@ public:
         std::string payload = jmessage.dump();
         zmq::message_t message(payload.size());
         memcpy (message.data(), payload.data(), payload.size());
-        //std::cout << "Publishing order book for: [" << m_productId << "]" << std::endl;
         m_sock.send(message, zmq::send_flags::none);
+
+        std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+        auto difference = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+        std::cout << "Publishing took" << difference << " micro seconds" << std::endl;
     }
 
     void publish(std::unique_ptr<Trade> trade){
@@ -79,6 +91,6 @@ public:
 
     zmq::context_t m_ctx;
     zmq::socket_t m_sock;
-    std::chrono::steady_clock::time_point lastTime;
     std::string m_productId;
+    boost::circular_buffer<std::chrono::steady_clock::time_point> m_stamps;
 };

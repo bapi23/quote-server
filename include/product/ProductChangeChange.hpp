@@ -18,13 +18,13 @@ public:
                       FloatingP price, 
                       FloatingP remainingSize, 
                       Side side,
-                      std::string productId):
-                ProductChange(productId),
+                      std::string productId,
+                      unsigned long sequenceNumber):
+                ProductChange(productId, sequenceNumber),
                 m_orderId(orderId),
                 m_price(price),
                 m_remainingSize(remainingSize),
                 m_side(side)
-
     {
     }
 

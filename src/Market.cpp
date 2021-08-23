@@ -34,6 +34,7 @@ Market::~Market(){
 
 void Market::onProductChange(std::unique_ptr<ProductChange> pc)
 {
+    assert(pc);
     {
         std::lock_guard<std::mutex> lg(productChangeHandlerMutex);
         productChanges.push_back(std::move(pc));
@@ -50,13 +51,13 @@ void Market::processProductChanges(){
             productChangeCv.wait_for(lk1, 100ms, [this]{return !productChanges.empty();});
             currentChanges = std::move(productChanges);
             productChanges.clear();
+            std::cout << "====Product changes size" << productChanges.size() << std::endl;
         }
 
         while(!currentChanges.empty()){
             auto pc = std::move(currentChanges.front());
             currentChanges.pop_front();
 
-            //std::cout << "size of the products: " << m_products.size() << std::endl; 
             {
                 std::unique_lock<std::mutex> lk2(marketDataMutex);
                 auto prodIt = m_products.find(pc->getProductId());

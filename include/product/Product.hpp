@@ -14,7 +14,7 @@ class Product {
 public:
 Product(const std::string productId, 
         std::unique_ptr<ProductChangePublisher> publisher): 
-    m_productId(productId), 
+    m_productId(productId),
     m_orderBook(std::make_unique<OrderBook>()),
     m_publisher(std::move(publisher))
 {
@@ -22,6 +22,9 @@ Product(const std::string productId,
 }
 
 void onProductChange(std::unique_ptr<ProductChange> pc) {
+ 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+
     bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
     std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
     if(!trades.empty()){
@@ -32,6 +35,9 @@ void onProductChange(std::unique_ptr<ProductChange> pc) {
     if(bookUpdated){
         m_publisher->publish(m_orderBook.get());
     }
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    auto difference = std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count();
+    std::cout << "Updating and publishing took" << difference << " micro seconds" << std::endl;
 }
 
 int hasClients(){

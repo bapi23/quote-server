@@ -3,16 +3,18 @@
 #include <vector>
 #include <algorithm>
 #include "nlohmann/json.hpp"
+#include <boost/circular_buffer.hpp>
 
 #include "RestTransport.hpp"
 #include "WebsocketTransport.hpp"
 #include "FeedClient.hpp"
-#include "CoinbaseFeedListener.hpp"
+#include "CoinbaseFeedProduct.hpp"
+
 
 
 class CoinbaseFeedClient: public FeedClient, MessageReceiver{
 public:
-
+    CoinbaseFeedClient();
     ~CoinbaseFeedClient();
 
     void onMessageReceived(const std::string& message);
@@ -23,9 +25,10 @@ private:
     std::string generateSubscribeMessage(const std::string& productId);
     std::string generateUnsubscribeMessage(const std::string& productId);
 
-    std::unordered_map<std::string, std::unique_ptr<CoinbaseFeedListener>> prodIdToListener;
+    std::unordered_map<std::string, std::unique_ptr<CoinbaseFeedProduct>> prodIdToListener;
     WebsocketTransport feedTransport;
     bool m_connected = false;
 
     std::mutex mutexFeedData;
+    boost::circular_buffer<std::chrono::steady_clock::time_point> m_stamps;
 };

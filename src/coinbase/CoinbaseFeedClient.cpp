@@ -2,11 +2,12 @@
 #include <vector>
 #include <algorithm>
 #include "nlohmann/json.hpp"
+#include <boost/numeric/conversion/cast.hpp>
 
 #include "RestTransport.hpp"
 #include "WebsocketTransport.hpp"
 #include "FeedClient.hpp"
-#include "coinbase/CoinbaseFeedListener.hpp"
+#include "coinbase/CoinbaseFeedProduct.hpp"
 #include "coinbase/CoinbaseFeedClient.hpp"
 
 namespace {
@@ -29,6 +30,8 @@ auto unsibscribe_template = json::parse(R"({
 
 }
 
+CoinbaseFeedClient::CoinbaseFeedClient(): m_stamps(2000){}
+
 CoinbaseFeedClient::~CoinbaseFeedClient(){
     feedTransport.unsubscribe("coinbaseFeed");
 }
@@ -40,6 +43,18 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
         if(!jmsg.contains("type")){
             std::cout << "Received message without type" << std::endl;
             return;
+        }
+
+        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+        m_stamps.push_back(begin);
+
+        if(m_stamps.size() > 0){
+            auto last = m_stamps.back();
+            auto first = m_stamps.front();
+            auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
+            auto messages_per_second = (boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(m_stamps.size())) * 1000;
+            std::cout << "Feed frequency = " << messages_per_second << " messages/s from the last " << m_stamps.size() << " messages" << std::endl;
+            //send metrics
         }
 
         if(jmsg.contains("product_id")){
@@ -74,7 +89,7 @@ void CoinbaseFeedClient::subscribe(const std::string& productId, ProductChangeLi
         auto it = prodIdToListener.find(productId);
         if(it == prodIdToListener.end()){
             prodIdToListener.emplace(
-                std::make_pair(productId, std::make_unique<CoinbaseFeedListener>(productId, listener)));
+                std::make_pair(productId, std::make_unique<CoinbaseFeedProduct>(productId, listener)));
         } else {
             std::cout << "listener already registered";
         }
@@ -85,7 +100,6 @@ void CoinbaseFeedClient::subscribe(const std::string& productId, ProductChangeLi
 
 void CoinbaseFeedClient::unsubscribe(const std::string& productId) {
     std::cout << "Unsubscribed " << productId << std::endl;
-    std::cout << "generated message" << generateUnsubscribeMessage(productId) << std::endl;
     feedTransport.send(generateUnsubscribeMessage(productId));
     std::lock_guard<std::mutex> lg(mutexFeedData);
     prodIdToListener.erase(productId);

@@ -3,8 +3,12 @@
 
 class ProductChangeResetOrderBook: public ProductChange{
 public:
-    ProductChangeResetOrderBook(const std::vector<Order>& bids, const std::vector<Order>& asks, std::vector<std::unique_ptr<ProductChange>>&& toMerge, const std::string& productId):
-        ProductChange(productId),
+    ProductChangeResetOrderBook(const std::vector<Order>& bids, 
+                                const std::vector<Order>& asks, 
+                                std::vector<std::unique_ptr<ProductChange>>&& toMerge, 
+                                const std::string& productId,
+                                unsigned long sequenceNumber):
+        ProductChange(productId, sequenceNumber),
         m_bids(bids),
         m_asks(asks),
         m_toMerge(std::move(toMerge))
