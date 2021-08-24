@@ -80,8 +80,8 @@ TEST_CASE("PerformanceTest", "MarketTest") {
     FeedClientSpy* feedPtr = feed.get();
     std::unique_ptr<ProductChangePublisherFactoryMock> publisherFactory = 
                             std::make_unique<ProductChangePublisherFactoryMock>();
-    std::vector<Order> bids = generateData(1, 10000);
-    std::vector<Order> asks = generateData(1001, 10000);
+    std::vector<Order> bids = generateData(1, 20000);
+    std::vector<Order> asks = generateData(1001, 20000);
     auto prodChangReq = 
             std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD", 2);
     ProductChangePublisherFactoryMock* publisherFactoryPtr = publisherFactory.get();
@@ -90,7 +90,9 @@ TEST_CASE("PerformanceTest", "MarketTest") {
         market.subscribe("clientId", "ETH-USD");
         REQUIRE(feedPtr->m_listeners.size() == 1);
         feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
-        for(auto& change: generateProductChanges(1, "ETH-USD", 10000))
+        for(auto& change: generateProductChanges(1, "ETH-USD", 10000)){
             feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(change));
+        }
+        std::this_thread::sleep_for(2000ms);
     }
 }

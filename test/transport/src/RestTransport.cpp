@@ -8,6 +8,7 @@
 #include <curlpp/Easy.hpp>
 #include <curlpp/Options.hpp>
 #include <curlpp/Exception.hpp>
+#include "nlohmann/json.hpp"
 
 #include "RestTransport.hpp"
 #include "Order.hpp"

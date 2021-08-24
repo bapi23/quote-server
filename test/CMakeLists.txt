@@ -2,6 +2,10 @@
 cmake_minimum_required(VERSION 3.10)
 
 
+# Prepare RapidJSON (RapidJSON is a header-only library)
+ExternalProject_Get_Property(rapidjson source_dir)
+set(RAPIDJSON_INCLUDE_DIR ${source_dir}/include)
+
 set(SOURCE
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
     ${PROJECT_SOURCE_DIR}/src/Order.cpp
@@ -88,6 +92,29 @@ target_link_libraries (RealCoinbaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${
 set_property(TARGET RealCoinbaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(RealCoinbaseFeedTest PROPERTIES
+            CXX_STANDARD 17
+            CXX_EXTENSIONS OFF
+            )
+
+add_executable(PublisherPerformanceTest PublisherPerformanceTest.cpp 
+                    ${PROJECT_SOURCE_DIR}/ext/catch2/catch2/catch.cpp
+                    ${PROJECT_SOURCE_DIR}/src/
+                    ${SOURCE}
+                    ${TEST_TRANSPORT_SOURCE})
+
+target_include_directories(PublisherPerformanceTest 
+                            PRIVATE 
+                                ${PROJECT_SOURCE_DIR}/ext/websocketpp 
+                                ${PROJECT_SOURCE_DIR}/ext/curlpp/include 
+                                ${PROJECT_SOURCE_DIR}/ext/catch2/ 
+                                ${PROJECT_SOURCE_DIR}/include
+                                transport/include
+                                ${RAPIDJSON_INCLUDE_DIR})
+
+target_link_libraries (PublisherPerformanceTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+set_property(TARGET RealCoinbaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
+
+set_target_properties(PublisherPerformanceTest PROPERTIES
             CXX_STANDARD 17
             CXX_EXTENSIONS OFF
             )

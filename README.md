@@ -58,6 +58,7 @@ Implementation documentation and message definitions + workflow can be found ins
 ##### TODO list
 - implement dynamic endpoint allocation with the usage of https://api.pro.coinbase.com/products/
 - Implement subscription confirmation between FeedClient and ClientRegister
+- floating point precision
 
 
 #### Things to discuss:
