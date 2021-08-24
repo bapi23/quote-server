@@ -21,14 +21,28 @@ Product(const std::string productId,
 
 }
 
-void onProductChange(std::unique_ptr<ProductChange> pc) {
- 
+void onProductChanges(std::vector<std::unique_ptr<ProductChange>> pcs) {
+    
+    if(pcs.empty()){
+        return;
+    }
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-    std::cout << "id of pc" << pc->getSequenceNumber() << std::endl;
 
-    bool bookUpdated = pc->updateOrderBook(m_orderBook.get());
+    bool bookUpdated = false;
+    for(auto& pc: pcs){
+        bool update = pc->updateOrderBook(m_orderBook.get());
+        if(update){
+            bookUpdated = true;
+        }
+    }
 
-    std::vector<std::unique_ptr<Trade>> trades = std::move(pc->getTrades());
+    std::vector<std::unique_ptr<Trade>> trades;
+    for(auto& pc: pcs){
+        auto currentTrades = std::move(pc->getTrades());
+        trades.insert(trades.end(), 
+                      std::make_move_iterator(currentTrades.begin()), 
+                      std::make_move_iterator(currentTrades.end()));
+    }
     if(!trades.empty()){
         for(auto& trade: trades){
             m_publisher->publish(std::move(trade));

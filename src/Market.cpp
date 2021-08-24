@@ -25,6 +25,13 @@ Market::Market(std::unique_ptr<FeedClient> feedClient,
 {
 }
 
+void Market::stop(){
+    isRunning = false;
+    if(m_productChangeHandlerThread.joinable()){
+        m_productChangeHandlerThread.join();
+    }
+}
+
 Market::~Market(){
     isRunning = false;
     if(m_productChangeHandlerThread.joinable()){
@@ -37,7 +44,7 @@ void Market::onProductChange(std::unique_ptr<ProductChange> pc)
     assert(pc);
     {
         std::lock_guard<std::mutex> lg(productChangeHandlerMutex);
-        productChanges.push_back(std::move(pc));
+        productChanges.insert({pc->getProductId(), std::move(pc)});
     }
     productChangeCv.notify_one();
 }
@@ -45,26 +52,30 @@ void Market::onProductChange(std::unique_ptr<ProductChange> pc)
 void Market::processProductChanges(){
     using namespace std::chrono_literals;
     while(isRunning){
-        std::deque<std::unique_ptr<ProductChange>> currentChanges;
+        std::unordered_multimap<std::string, std::unique_ptr<ProductChange>> currentChanges;
         {
             std::unique_lock<std::mutex> lk1(productChangeHandlerMutex);
             productChangeCv.wait_for(lk1, 100ms, [this]{return !productChanges.empty();});
             currentChanges = std::move(productChanges);
             productChanges.clear();
-            std::cout << "====Product changes size" << productChanges.size() << std::endl;
         }
 
-        while(!currentChanges.empty()){
-            auto pc = std::move(currentChanges.front());
-            currentChanges.pop_front();
-
+        std::unique_lock<std::mutex> lk2(marketDataMutex);
+        auto it = currentChanges.begin();
+        while(it != currentChanges.end()){
             {
-                std::unique_lock<std::mutex> lk2(marketDataMutex);
-                auto prodIt = m_products.find(pc->getProductId());
+                const std::string productId = it->first;
+                std::vector<std::unique_ptr<ProductChange>> changes;
+                while(it != currentChanges.end() && it->first == productId){
+                    changes.push_back(std::move(it->second));
+                    ++it;
+                }
+
+                auto prodIt = m_products.find(productId);
                 if(prodIt != m_products.end()){
-                    prodIt->second->onProductChange(std::move(pc));
+                    prodIt->second->onProductChanges(std::move(changes));
                 } else {
-                    std::cout << "No product with" << pc->getProductId() << " id" << std::endl;
+                    std::cout << "No product with" << productId << " id" << std::endl;
                 }
             }
         }

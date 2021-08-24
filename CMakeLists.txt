@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 project(qs_server)
 
 
+
 set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory(ext/json)
 add_subdirectory(ext/curlpp)

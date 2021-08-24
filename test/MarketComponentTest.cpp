@@ -40,12 +40,12 @@ TEST_CASE("ProductShouldPublishFullOrderbook", "MarketTest") {
     auto prodChangReq = 
             std::make_unique<ProductChangeResetOrderBook>(bids, asks, std::vector<std::unique_ptr<ProductChange>>(), "ETH-USD", 2);
     ProductChangePublisherFactoryMock* publisherFactoryPtr = publisherFactory.get();
-    {
-        Market market(std::move(feed), std::move(publisherFactory));
-        market.subscribe("clientId", "ETH-USD");
-        REQUIRE(feedPtr->m_listeners.size() == 1);
-        feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
-    }
+    Market market(std::move(feed), std::move(publisherFactory));
+    market.subscribe("clientId", "ETH-USD");
+    REQUIRE(feedPtr->m_listeners.size() == 1);
+    feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
+    std::this_thread::sleep_for(200ms);
+    market.stop();
 
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_asks.size() == 2);
@@ -68,6 +68,9 @@ TEST_CASE("ProductShouldPublishTrade", "MarketTest") {
     auto prodChangReq = 
         std::make_unique<ProductChangeDone>("order_id", Side::Buy, "ETH-USD", 2);
     feedPtr->m_listeners["ETH-USD"]->onProductChange(std::move(prodChangReq));
+    std::this_thread::sleep_for(200ms);
+    market.stop();
+
 
     REQUIRE(publisherFactoryPtr->pubPtr->m_trades.size() == 1);
 

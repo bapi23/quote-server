@@ -26,6 +26,9 @@ public:
     void subscribe(const std::string& clientId, const std::string& prodId) override;
     void unsubscribe(const std::string& clientId, const std::string& prodId) override;
 
+    // for testing purposes
+    void stop();
+
 private:
     std::unique_ptr<FeedClient> m_feedClient;
     std::unordered_map<std::string, std::shared_ptr<Product>> m_products;
@@ -33,7 +36,7 @@ private:
     std::unique_ptr<ProductChangePublisherFactory> m_publisherFactory;
     std::mutex marketDataMutex;
     std::mutex productChangeHandlerMutex;
-    std::deque<std::unique_ptr<ProductChange>> productChanges;
+    std::unordered_multimap<std::string, std::unique_ptr<ProductChange>> productChanges;
     std::condition_variable productChangeCv;
     std::atomic<bool> isRunning{true};
     std::thread m_productChangeHandlerThread;
