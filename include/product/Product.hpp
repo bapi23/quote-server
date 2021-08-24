@@ -50,7 +50,7 @@ void onProductChanges(std::vector<std::unique_ptr<ProductChange>> pcs) {
     }
     std::chrono::steady_clock::time_point orederbook = std::chrono::steady_clock::now();
     auto differenceOrderbook = std::chrono::duration_cast<std::chrono::microseconds>(orederbook - begin).count();
-    std::cout << "Updating Orderbook and trades" << differenceOrderbook << " [µs]" << std::endl;
+    std::cout << "Updating Orderbook and trades " << differenceOrderbook << " [µs]" << std::endl;
     
     if(bookUpdated){
         m_publisher->publish(m_orderBook.get());

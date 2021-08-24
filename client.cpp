@@ -13,6 +13,7 @@
 
 
 #include <boost/program_options.hpp>
+#include "Message.pb.h"
 
 #include "nlohmann/json.hpp"
 
@@ -58,16 +59,14 @@ void handleFeedMessages(){
         while(!newMessages.empty()){
             auto message = newMessages.front();
             newMessages.pop();
-            auto jmsg = nlohmann::json::parse(message);
-             if(jmsg.contains("message")){
-                 if(jmsg["message"] == "trade") {
-                    std::cout << "["<< jmsg["product_id"] << "] " << " Received new trade message of type: " << jmsg["type"] << std::endl;
-                 } else if(jmsg["message"] == "orderbook"){
-                    std::cout << "["<< jmsg["product_id"] << "] " << "Received new orderbook message" << std::endl;
-                 }
-             } else {
-                 std::cout << "Received unsupported message type" << std::endl;
-             }
+
+            qs::qsMessage pMessage;
+            pMessage.ParseFromString(message);
+            if(pMessage.message_type() == qs::MessageType_ORDERBOOK){
+                 std::cout << "["<< pMessage.order_book().product_id() << "] " << "Received new orderbook message" << std::endl;
+            } else if(pMessage.message_type() == qs::MessageType_TRADE){
+                std::cout << "["<< pMessage.trade().product_id() << "] " << " Received new trade message of type: " << pMessage.trade().type() << std::endl;
+            }
         }
     }
 }
@@ -140,19 +139,16 @@ void hendleNewEndpoints(){
                     }
                     auto data = std::string(static_cast<char*>(message.data()), message.size());
                     {
-                        const auto jmsg = nlohmann::json::parse(data);
-                        if(jmsg.contains("data")){
-                            std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
-                            stamps.push_back(begin);
+                        std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+                        stamps.push_back(begin);
 
-                            if(stamps.size() > 0){
-                                auto last = stamps.back();
-                                auto first = stamps.front();
-                                auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
-                                auto messages_per_second = boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(stamps.size()) * 1000;
-                                std::cout << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
-                                // Send metrics
-                            }
+                        if(stamps.size() > 0){
+                            auto last = stamps.back();
+                            auto first = stamps.front();
+                            auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
+                            auto messages_per_second = boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(stamps.size()) * 1000;
+                            std::cout << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
+                            // Send metrics
                         }
 
                         std::unique_lock<std::mutex> lk(mutexFeedMessages);

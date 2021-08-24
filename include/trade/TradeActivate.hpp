@@ -2,6 +2,7 @@
 #include <string>
 
 #include "Trade.hpp"
+#include "Message.pb.h"
 
 class TradeActivate: public Trade{
 public:
@@ -17,14 +18,16 @@ public:
     }
     
     virtual std::string generateMessage(){
-        nlohmann::json jmessage = {
-            {"message", "trade"}, 
-            {"type", "activate"},
-            {"order_id", m_orderId},
-            {"size", m_size},
-            {"price", m_price}
-        };
-        return jmessage.dump();
+        qs::qsMessage pMessage;
+        pMessage.set_message_type(qs::MessageType_TRADE);
+
+        qs::Trade* trade = pMessage.mutable_trade();
+        trade->set_type(qs::TradeType_ACTIVATE);
+        trade->set_order_id(m_orderId);
+        trade->size(m_size);
+        trade->price(m_price);
+
+        return pMessage.SerializeAsString();
     }
 
     private:

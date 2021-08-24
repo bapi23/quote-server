@@ -1,0 +1,43 @@
+syntax = "proto2";
+package qs;
+
+enum MessageType {
+    MessageType_ORDERBOOK = 0;
+    MessageType_TRADE = 1;
+}
+
+enum TradeType {
+    TradeType_ACTIVATE = 0;
+    TradeType_CHANGE = 1;
+    TradeType_DONE = 2;
+    TradeType_MATCH = 3;
+    TradeType_OPEN = 4;
+}
+
+message Order {
+  required string order_id = 1;
+  required float price = 2;
+  required float size = 3;
+}
+
+message OrderBook {
+  required string product_id = 1;
+  repeated Order asks = 2;
+  repeated Order bids = 3;
+}
+
+message Trade {
+  required TradeType type = 1;
+  required string product_id = 2;
+  required string order_id = 3;
+  optional float size = 4;
+  optional float prive = 5;
+}
+
+message qsMessage{
+    required MessageType message_type = 1;
+    oneof msg {
+        Trade trade = 2;
+        OrderBook order_book = 3;
+    }   
+}

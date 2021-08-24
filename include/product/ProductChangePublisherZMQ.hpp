@@ -15,8 +15,10 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-using json = nlohmann::json;
+#include "Message.pb.h"
 
+using json = nlohmann::json;
+#define PROTOCOL_BUF_PUB
 
 class ProductChangePublisherZMQ: public ProductChangePublisher
 {
@@ -40,6 +42,30 @@ public:
             // Send metrics
         }
 
+#ifdef PROTOCOL_BUF_PUB
+        qs::qsMessage pMessage;
+        pMessage.set_message_type(qs::MessageType_ORDERBOOK);
+
+        qs::OrderBook* book = pMessage.mutable_order_book();
+
+        for(const auto& order: view->getAsks()){
+            qs::Order* pOrder = book->mutable_asks()->Add();
+            pOrder->set_order_id(order.order_id);
+            pOrder->set_price(order.price);
+            pOrder->set_size(order.size);
+        }
+
+        for(const auto& order: view->getBids()){
+            qs::Order* pOrder = book->mutable_bids()->Add();
+            pOrder->set_order_id(order.order_id);
+            pOrder->set_price(order.price);
+            pOrder->set_size(order.size);
+        }
+
+        book->set_product_id(m_productId);
+#endif
+
+#ifdef RAPID_JSON_PUB
         using namespace rapidjson;
 
         const char* json = "{\"message\":\"orderbook\"}";
@@ -92,16 +118,22 @@ public:
 
         rapidMeesage.AddMember("bids", jBids, allocator);
         rapidMeesage.AddMember("asks", jAsks, allocator);
+#endif
 
         std::chrono::steady_clock::time_point creating = std::chrono::steady_clock::now();
         auto differenceCreating = std::chrono::duration_cast<std::chrono::microseconds>(creating - begin).count();
         std::cout << "Publishing (creating json) took " << differenceCreating << " [µs]" << std::endl;
 
+#ifdef RAPID_JSON_PUB
         rapidjson::StringBuffer strbuf;
         rapidjson::Writer<rapidjson::StringBuffer> writer(strbuf);
         rapidMeesage.Accept(writer);
-
         std::string payload =  strbuf.GetString();
+#endif
+
+#ifdef PROTOCOL_BUF_PUB
+        std::string payload = pMessage.SerializeAsString();
+#endif
 
         std::chrono::steady_clock::time_point dumping = std::chrono::steady_clock::now();
         auto differenceDumping = std::chrono::duration_cast<std::chrono::microseconds>(dumping - begin).count();
@@ -117,11 +149,6 @@ public:
     void publish(std::unique_ptr<Trade> trade){
         std::string payload = trade->generateMessage();
 
-        // TODO begin return nlohmann json or create TradeView!
-        auto jmessage = nlohmann::json::parse(payload); 
-        jmessage["product_id"] = m_productId;
-        payload = jmessage.dump();
-        // TODO end
         m_publisher.publish(payload);
     }
 

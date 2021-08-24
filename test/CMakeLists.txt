@@ -2,9 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 
-# Prepare RapidJSON (RapidJSON is a header-only library)
-ExternalProject_Get_Property(rapidjson source_dir)
-set(RAPIDJSON_INCLUDE_DIR ${source_dir}/include)
+set(RAPIDJSON_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/ext/rapidjson/include)
 
 set(SOURCE
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedMessageHandler.cpp
@@ -43,7 +41,7 @@ target_include_directories(MarketComponentTest
 
 target_link_libraries (MarketComponentTest 
                             ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} 
-                            nlohmann_json::nlohmann_json curlpp)
+                            nlohmann_json::nlohmann_json curlpp qs_protos)
                             
 set_property(TARGET MarketComponentTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
@@ -65,7 +63,7 @@ target_include_directories(CoibaseFeedTest
                                 ${PROJECT_SOURCE_DIR}/include
                                 transport/include)
 
-target_link_libraries (CoibaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+target_link_libraries (CoibaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp qs_protos)
 set_property(TARGET CoibaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(CoibaseFeedTest PROPERTIES
@@ -88,7 +86,7 @@ target_include_directories(RealCoinbaseFeedTest
                                 ${PROJECT_SOURCE_DIR}/include
                                 ${PROJECT_SOURCE_DIR}/transport/include)
 
-target_link_libraries (RealCoinbaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+target_link_libraries (RealCoinbaseFeedTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp qs_protos)
 set_property(TARGET RealCoinbaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(RealCoinbaseFeedTest PROPERTIES
@@ -111,7 +109,7 @@ target_include_directories(PublisherPerformanceTest
                                 transport/include
                                 ${RAPIDJSON_INCLUDE_DIR})
 
-target_link_libraries (PublisherPerformanceTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp)
+target_link_libraries (PublisherPerformanceTest ${Boost_LIBRARIES} cppzmq pthread ${OPENSSL_LIBRARIES} nlohmann_json::nlohmann_json curlpp qs_protos)
 set_property(TARGET RealCoinbaseFeedTest APPEND PROPERTY INCLUDE_DIRECTORIES ${Boost_INCLUDE_DIR})
 
 set_target_properties(PublisherPerformanceTest PROPERTIES

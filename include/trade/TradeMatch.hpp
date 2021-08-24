@@ -3,6 +3,7 @@
 
 #include "Trade.hpp"
 #include "utils/FloatingP.hpp"
+#include "Message.pb.h"
 
 class TradeMatch: public Trade{
 public:
@@ -17,13 +18,15 @@ public:
     }
 
     std::string generateMessage(){
-        nlohmann::json jmessage = {
-            {"message", "trade"},
-            {"type", "match"},
-            {"order_id", m_orderId},
-            {"new_size", m_size}
-        };
-        return jmessage.dump();
+        qs::qsMessage pMessage;
+        pMessage.set_message_type(qs::MessageType_TRADE);
+
+        qs::Trade* trade = pMessage.mutable_trade();
+        trade->set_type(qs::TradeType_MATCH);
+        trade->set_order_id(m_orderId);
+        trade->set_size(m_size);
+
+        return pMessage.SerializeAsString();
     }
 
 private:

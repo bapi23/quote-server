@@ -72,3 +72,18 @@ Implementation documentation and message definitions + workflow can be found ins
 
 - Tests can be used to measure how system will behave under high load.
 - Metrics should be used to determine messages frequency and delays between components (based on time stamps)
+
+Publisher profiling:
+Performance of serializing 100k of Orders 
+with protocol buffers:
+```
+Publishing (creating json) took 8567 [µs]
+Publishing (dumping json) took 11654 [µs]
+Publishing (sending json) took 17 [µs]
+```
+with rapid json
+```
+Publishing (creating json) took 64794 [µs]
+Publishing (dumping json) took 93244 [µs]
+Publishing (sending json) took 19 [µs]
+```
