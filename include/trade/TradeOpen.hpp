@@ -7,7 +7,8 @@
 
 class TradeOpen: public Trade{
 public:
-    TradeOpen(const std::string& orderId, FloatingP size, FloatingP price):
+    TradeOpen(const std::string& orderId, FloatingP size, FloatingP price, const std::string& productId):
+        Trade(productId),
         m_orderId(orderId),
         m_size(size),
         m_price(price)
@@ -25,8 +26,9 @@ public:
         qs::Trade* trade = pMessage.mutable_trade();
         trade->set_type(qs::TradeType_OPEN);
         trade->set_order_id(m_orderId);
-        trade->size(m_size);
-        trade->price(m_price);
+        trade->set_product_id(getProductId());
+        trade->set_size(m_size);
+        trade->set_price(m_price);
 
         return pMessage.SerializeAsString();
     }

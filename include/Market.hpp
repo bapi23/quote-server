@@ -14,14 +14,16 @@
 #include "Client.hpp"
 #include "FeedClient.hpp"
 #include "product/ProductChangePublisherFactory.hpp"
+#include "TradeListener.hpp"
 
-class Market: public ProductSubscriber, ProductChangeListener{
+class Market: public ProductSubscriber, ProductChangeListener, TradeListener{
 public:
     Market(std::unique_ptr<FeedClient> feedClient, 
            std::unique_ptr<ProductChangePublisherFactory> publisherFactory);
     ~Market();
 
     void onProductChange(std::unique_ptr<ProductChange> pc) override;
+    void onTrade(std::unique_ptr<Trade> trade);
     void processProductChanges();
     void subscribe(const std::string& clientId, const std::string& prodId) override;
     void unsubscribe(const std::string& clientId, const std::string& prodId) override;

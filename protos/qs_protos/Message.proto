@@ -31,7 +31,11 @@ message Trade {
   required string product_id = 2;
   required string order_id = 3;
   optional float size = 4;
-  optional float prive = 5;
+  optional float price = 5;
+  optional float founds = 6;
+  optional float stop_price = 7;
+  optional string stop_type = 8;
+  optional float funds = 9;
 }
 
 message qsMessage{

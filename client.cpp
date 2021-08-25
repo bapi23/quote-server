@@ -147,7 +147,7 @@ void hendleNewEndpoints(){
                             auto first = stamps.front();
                             auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
                             auto messages_per_second = boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(stamps.size()) * 1000;
-                            std::cout << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
+                            //std::cout << "Feed frequency = " << messages_per_second << " messages/s" << std::endl;
                             // Send metrics
                         }
 

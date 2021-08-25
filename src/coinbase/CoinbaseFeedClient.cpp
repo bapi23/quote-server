@@ -53,7 +53,7 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
             auto first = m_stamps.front();
             auto difference_ms = std::chrono::duration_cast<std::chrono::milliseconds>(last - first).count();
             auto messages_per_second = (boost::numeric_cast<float>(difference_ms)/boost::numeric_cast<float>(m_stamps.size())) * 1000;
-            std::cout << "Feed frequency = " << messages_per_second << " messages/s from the last " << m_stamps.size() << " messages" << std::endl;
+            //std::cout << "Feed frequency = " << messages_per_second << " messages/s from the last " << m_stamps.size() << " messages" << std::endl;
             //send metrics
         }
 

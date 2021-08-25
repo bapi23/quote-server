@@ -14,8 +14,8 @@ public:
     ProductChange(const std::string& productId, long unsigned sequenceNumber): 
         m_productId(productId),
         m_sequenceNumber(sequenceNumber){}
-    virtual std::string getProductId(){return m_productId;}
-    long unsigned getSequenceNumber(){return m_sequenceNumber;}
+    virtual std::string getProductId() const {return m_productId;}
+    long unsigned getSequenceNumber() const {return m_sequenceNumber;}
     
     virtual std::vector<std::unique_ptr<Trade>> getTrades() const = 0;
     virtual bool updateOrderBook(OrderBook* orderBook) const = 0;

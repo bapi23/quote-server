@@ -7,7 +7,8 @@
 
 class TradeMatch: public Trade{
 public:
-    TradeMatch(std::string orderId, FloatingP size):
+    TradeMatch(std::string orderId, FloatingP size, const std::string& productId):
+        Trade(productId),
         m_orderId(orderId),
         m_size(size)
     {
@@ -24,6 +25,7 @@ public:
         qs::Trade* trade = pMessage.mutable_trade();
         trade->set_type(qs::TradeType_MATCH);
         trade->set_order_id(m_orderId);
+        trade->set_product_id(getProductId());
         trade->set_size(m_size);
 
         return pMessage.SerializeAsString();

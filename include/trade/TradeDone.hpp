@@ -8,7 +8,8 @@
 
 class TradeDone: public Trade{
 public:
-    TradeDone(const std::string& orderId):
+    TradeDone(const std::string& orderId, const std::string& productId):
+        Trade(productId),
         m_orderId(orderId)
     {}
 
@@ -22,6 +23,7 @@ public:
 
         qs::Trade* trade = pMessage.mutable_trade();
         trade->set_type(qs::TradeType_DONE);
+        trade->set_product_id(getProductId());
         trade->set_order_id(m_orderId);
 
         return pMessage.SerializeAsString();

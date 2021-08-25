@@ -49,6 +49,10 @@ void Market::onProductChange(std::unique_ptr<ProductChange> pc)
     productChangeCv.notify_one();
 }
 
+void Market::onTrade(std::unique_ptr<Trade> trade){
+
+}
+
 void Market::processProductChanges(){
     using namespace std::chrono_literals;
     while(isRunning){

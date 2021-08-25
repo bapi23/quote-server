@@ -8,7 +8,9 @@
 
 class TradeChange: public Trade{
 public:
-    TradeChange(const std::string& order_id, FloatingP newSize){
+    TradeChange(const std::string& order_id, FloatingP newSize, const std::string& productId):
+        Trade(productId)
+    {
 
     }
 
@@ -23,7 +25,8 @@ public:
         qs::Trade* trade = pMessage.mutable_trade();
         trade->set_type(qs::TradeType_CHANGE);
         trade->set_order_id(m_orderId);
-        trade->size(newSize);
+        trade->set_product_id(getProductId());
+        trade->set_size(newSize);
 
         return pMessage.SerializeAsString();
     }

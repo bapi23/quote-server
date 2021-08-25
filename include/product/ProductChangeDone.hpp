@@ -33,7 +33,7 @@ public:
 
     std::vector<std::unique_ptr<Trade>> getTrades() const override{
         std::vector<std::unique_ptr<Trade>> vec;
-        vec.push_back(std::make_unique<TradeDone>(m_orderId));
+        vec.push_back(std::make_unique<TradeDone>(m_orderId, getProductId()));
         return vec;
     }
 

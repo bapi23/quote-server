@@ -11,7 +11,9 @@ RUN apt-get update \
         libcurl4-openssl-dev \
         libssl-dev \
         openssh-client \
-        ca-certificates
+        ca-certificates \
+        libprotobuf-dev \
+        protobuf-compiler
 
 RUN git clone https://github.com/zeromq/libzmq.git && \
     cd libzmq && git checkout v4.3.0 && \
