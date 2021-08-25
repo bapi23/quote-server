@@ -87,3 +87,7 @@ Publishing (creating json) took 64794 [µs]
 Publishing (dumping json) took 93244 [µs]
 Publishing (sending json) took 19 [µs]
 ```
+
+- Ideas on how to see delays:
+  1. Add metrics on how long messages are waiting in the queue
+  2. Estimate average times for product id handling

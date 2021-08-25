@@ -3,6 +3,8 @@ Client server can provide the following data:
 OrderBook message with up-to-date asks and bids orders contining size, price and order id.
 All messages definition are located under protos/qs_protos/Message.proto
 
+On the client side you should use protos/qs_protos/Message.proto to implement deserialization. See client.cpp example
+
 
 
 ###Trade messages

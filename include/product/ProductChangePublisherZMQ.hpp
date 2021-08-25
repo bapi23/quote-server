@@ -26,7 +26,7 @@ public:
     ProductChangePublisherZMQ(const std::string& productId):
         m_productId(productId),
         m_stamps(2000),
-        m_publisher(transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].orderbookPort)
+        m_publisher(transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).orderbookPort)
         {
         }
 

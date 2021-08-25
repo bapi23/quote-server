@@ -34,7 +34,7 @@ bool isTradeMsg(const nlohmann::json& msg){
         return false;
     } else {
         if(msg["type"] == "activate" ||
-           msg["type"] == "receive" ||
+           msg["type"] == "received" ||
            msg["type"] == "match") {
                return true;
            } else {

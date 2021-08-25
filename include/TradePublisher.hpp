@@ -24,7 +24,7 @@ class TradePublisher
 {
 public:
     TradePublisher(const std::string& productId):
-        m_publisher(transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].tradePort)
+        m_publisher(transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).tradePort)
         {
         }
 

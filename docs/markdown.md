@@ -3,12 +3,13 @@
 ### Transport side
 
 ##### Coinbase FeedClient sequence diagram
-WebsocketTransport signals message reception by MessageReceiver interface. It shows example of implementation for Coinbase
+WebsocketTransport feed message reception by MessageReceiver interface. It shows example of implementation for Coinbase
 ```plantuml
 @startuml "Message Received"
 CoinbaseFeedApi->WebsocketTransport: onMessage(msg)
 WebsocketTransport->CoinbaseFeedClient : onMessageReceived(msg)
 CoinbaseFeedClient->CoinbaseFeedProduct : onMessageReceived(msg)
+CoinbaseFeedClient->TradeListener: if isTrade(msg): onTrade(msg)
 CoinbaseFeedProduct->CoinbaseFeedMessageHandler: OnMessageReceiver(msg)
 CoinbaseFeedMessageHandler->ProductChangeListener: OnProductChanged(ProductChange)
 @enduml
@@ -41,10 +42,8 @@ class ProductListener
 
 CoinbaseFeedClient "1" *-- "many" CoinbaseFeedProduct : contains
 FeedClient <|-- CoinbaseFeedClient
-MessageReceiver <|-- CoinbaseFeedClient
-MessageReceiver <|-- CoinbaseFeedMessageHandler
-MessageReceiver <|-- CoinbaseFeedProduct
 
+CoinbaseFeedClient "1" *-- "1" TradeListener
 CoinbaseFeedProduct "1" *-- "1" CoinbaseFeedMessageHandler : contains
 CoinbaseFeedProduct "1" *-- "1" ProductListener : contains
 @enduml
@@ -77,14 +76,9 @@ Classes wchich implements ProductChange interface encapsulates logic related to 
 
 ```plantuml
 @startuml "ProductChangeReceived"
+CoinbaseFeedMessageHandler->Product: onProductChange(productChange)
 Product->ProductChange : updateOrderBook(OrderBook): (updated) bool
-Product->ProductChange : getTrade(msg): Trade
-Product->Client: if(updated): onOrderBook(OrderBookView)
-Client->ClientListener: notifyOrderBookChanged(clientId, OrderBookView):
-ClientListener->ClientServer: sendOrderBookUpdate(json)
-Product->Client: if(trade) OnTrade(Trade)
-Client->ClientListener: notifyOrderBookChanged(clientId,orderBookView->toJSON()):
-ClientListener->ClientServer: sendOrderBookUpdate(json)
+Product->ProductChangePublisher: if(updated): publish(OrderBookView)
 @enduml
 ```
 
@@ -100,5 +94,18 @@ ProductChange <|-- ProductChangeDone
 ProductChange <|-- ProductChangeOpen
 ProductChange <|-- ProductChangeMatch
 ProductChange <|-- ProductChangeChanged
+@enduml
+```
+
+##### ProductData subclasses
+```plantuml
+@startuml "Trade class"
+abstract Trade
+class TradeActivate
+class TradeMatch
+class TradeReceive
+Trade <|-- TradeActivate
+Trade <|-- TradeMatch
+Trade <|-- TradeReceive
 @enduml
 ```

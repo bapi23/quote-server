@@ -72,7 +72,7 @@ void ClientService::runImpl(){
                         error = "UnknownClientId";
                     }
 
-                    if(transport::prodIdToPort.count(productId) == 0){
+                    if(!transport::EndpointProvider::getInstance().contains(productId)){
                         std::cout << "Invalid subscribe_request server don't know the product_id: " << clientId << std::endl;
                         error = "UnknownProductId";
                     }
@@ -93,8 +93,8 @@ void ClientService::runImpl(){
                                 {"type", "subscribe_request"},
                                 {"client_id", clientId},
                                 {"product_id", productId},
-                                {"product_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].orderbookPort},
-                                {"trade_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].tradePort}
+                                {"product_endpoint", "tcp://" + transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).orderbookPort},
+                                {"trade_endpoint", "tcp://" + transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).tradePort}
                                 // TODO send full list of subscription
                             };
                         data = jmessage.dump();
@@ -123,7 +123,7 @@ void ClientService::runImpl(){
                         error = "UnknownClientId";
                     }
 
-                    if(transport::prodIdToPort.count(productId) == 0){
+                    if(! transport::EndpointProvider::getInstance().contains(productId)){
                         std::cout << "Invalid unsubscribe_request server don't know the product_id: " << clientId << std::endl;
                         error = "UnknownProductId";
                     }
@@ -145,8 +145,8 @@ void ClientService::runImpl(){
                                 {"type", "unsubscribe_request"},
                                 {"client_id", clientId},
                                 {"product_id", productId},
-                                {"product_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].orderbookPort},
-                                {"trade_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].tradePort}
+                                {"product_endpoint", "tcp://" + transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).orderbookPort},
+                                {"trade_endpoint", "tcp://" + transport::EndpointProvider::getInstance().prodIdToPort(productId).address + ":" + transport::EndpointProvider::getInstance().prodIdToPort(productId).tradePort}
                                 // TODO send full list of subscription
                             };
                         data = jmessage.dump();

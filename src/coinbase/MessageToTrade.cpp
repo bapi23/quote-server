@@ -30,13 +30,12 @@ std::unique_ptr<Trade> MessageToTrade::getTrade(const nlohmann::json& jmsg) {
         } else if (jmsg["type"].get<std::string>() == "received") {
             const std::string orderId = jmsg["order_id"].get<std::string>();
             long unsigned sequence = jmsg["sequence"].get<long unsigned>();
-            const std::string price = jmsg["price"].get<std::string>();
-            const std::string size = jmsg["size"].get<std::string>();
+            const std::string founds = jmsg["founds"].get<std::string>();
             const std::string orderType = jmsg["order_type"].get<std::string>();
             const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
             const std::string productId =  jmsg["product_id"].get<std::string>();
 
-            trade = std::make_unique<TradeReceive>(orderId, std::stod(size), std::stod(price), side, orderType, productId);
+            trade = std::make_unique<TradeReceive>(orderId, std::stod(founds), side, orderType, productId);
         } else if (jmsg["type"].get<std::string>() == "match") {
             const std::string makerOrderId = jmsg["maker_order_id"].get<std::string>();
             const std::string takerOrderId = jmsg["taker_order_id"].get<std::string>();

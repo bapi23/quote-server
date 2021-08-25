@@ -23,7 +23,6 @@ class TradeReceive: public Trade{
 public:
     TradeReceive(const std::string& orderId, 
                   FloatingP size, 
-                  FloatingP price,
                   Side side,
                   const std::string orderType,
                   const std::string& productId):
@@ -31,7 +30,6 @@ public:
         m_orderId(orderId),
         m_size(size),
         m_side(side),
-        m_price(price),
         m_orderType(orderType)
     {
     }
@@ -49,7 +47,6 @@ public:
         trade->set_order_id(m_orderId);
         trade->set_product_id(getProductId());
         trade->set_size(m_size);
-        trade->set_price(m_price);
         trade->set_order_type(m_orderType);
 
         return pMessage.SerializeAsString();
@@ -59,6 +56,5 @@ public:
     std::string m_orderId;
     FloatingP m_size;
     Side m_side;
-    FloatingP m_price;
     std::string m_orderType;
 };
