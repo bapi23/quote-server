@@ -35,7 +35,8 @@ message Trade {
   optional float founds = 6;
   optional float stop_price = 7;
   optional string stop_type = 8;
-  optional float funds = 9;
+  optional string order_type = 9;
+  optional float funds = 10;
 }
 
 message qsMessage{

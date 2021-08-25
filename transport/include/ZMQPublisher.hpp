@@ -6,11 +6,11 @@
 
 class ZMQPublisher{
 public:
-    ZMQPublisher(const std::string& productId):
+    ZMQPublisher(const std::string& address):
         m_ctx(),
         m_sock(m_ctx, zmq::socket_type::pub){
-        std::cout << "Binding product to uri: tcp://127.0.0.1:" + transport::prodIdToPort[productId];
-        bind_addr = "tcp://127.0.0.1:" + transport::prodIdToPort[productId];
+        std::cout << "Binding product to uri: " << address << std::endl;
+        bind_addr = "tcp://" + address;
         m_sock.bind(bind_addr);
     }
 

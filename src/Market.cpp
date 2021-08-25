@@ -50,7 +50,13 @@ void Market::onProductChange(std::unique_ptr<ProductChange> pc)
 }
 
 void Market::onTrade(std::unique_ptr<Trade> trade){
-
+    std::lock_guard<std::mutex> lg(mutexTrades);
+    auto it = m_trade_publishers.find(trade->getProductId());
+    if(it == m_trade_publishers.end()){
+        std::cout << "Received trade without any client" << std::endl;
+        return;
+    }
+    it->second->publish(std::move(trade));
 }
 
 void Market::processProductChanges(){
@@ -87,33 +93,44 @@ void Market::processProductChanges(){
 }
 
 void Market::subscribe(const std::string& clientId, const std::string& prodId) {
-    std::lock_guard<std::mutex> lg(marketDataMutex);
-    std::cout << "Subscribing client " << clientId << " for " << prodId;
+    {
+        std::lock_guard<std::mutex> lg(marketDataMutex);
+        std::cout << "Subscribing client " << clientId << " for " << prodId;
 
-    auto it = m_clients.find(clientId);
-    if(it == m_clients.end()){
-        m_clients.insert({clientId, new Client(clientId)});
+        auto it = m_clients.find(clientId);
+        if(it == m_clients.end()){
+            m_clients.insert({clientId, new Client(clientId)});
+        }
+
+        auto prodIt = m_products.find(prodId);
+        if(prodIt == m_products.end()){
+            m_products.insert({prodId, std::make_shared<Product>(prodId, m_publisherFactory->createPublisher(prodId))});
+            m_feedClient->subscribe(prodId, this);
+        }
     }
-
-    auto prodIt = m_products.find(prodId);
-    if(prodIt == m_products.end()){
-        m_products.insert({prodId, std::make_shared<Product>(prodId, m_publisherFactory->createPublisher(prodId))});
+    {
+        std::lock_guard<std::mutex> lg(mutexTrades);
+        auto tradeIt = m_trade_publishers.find(prodId);
+        if(tradeIt == m_trade_publishers.end()){
+            m_trade_publishers.insert({prodId, std::make_unique<TradePublisher>(prodId)});
+        }
     }
-
-    m_feedClient->subscribe(prodId, this);
 }
 
 void Market::unsubscribe(const std::string& clientId, const std::string& prodId) {
-    std::lock_guard<std::mutex> lg(marketDataMutex);
-    std::cout << "Unsubscribing client " << clientId << " from " << prodId;
-    auto it = m_products.find(prodId);
-    if(it != m_products.end()){
-        it->second->removeClient(clientId);
-    }
-    if(!it->second->hasClients())
     {
-        std::cout << "No more clients for " << prodId << " unsubscribing from the Market" << std::endl;
-        m_feedClient->unsubscribe(prodId);
-        m_products.erase(prodId);
+        std::scoped_lock lck{marketDataMutex, mutexTrades};
+        std::cout << "Unsubscribing client " << clientId << " from " << prodId;
+        auto it = m_products.find(prodId);
+        if(it != m_products.end()){
+            it->second->removeClient(clientId);
+        }
+        if(!it->second->hasClients())
+        {
+            std::cout << "No more clients for " << prodId << " unsubscribing from the Market" << std::endl;
+            m_feedClient->unsubscribe(prodId);
+            m_products.erase(prodId);
+            m_trade_publishers.erase(prodId);
+        }
     }
 }

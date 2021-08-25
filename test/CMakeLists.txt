@@ -12,6 +12,8 @@ set(SOURCE
     ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedProduct.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedClient.cpp
+    ${PROJECT_SOURCE_DIR}/src/coinbase/MessageToTrade.cpp
+
 
     ${PROJECT_SOURCE_DIR}/src/utils/uuid.cpp
 )

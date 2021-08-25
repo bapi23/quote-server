@@ -15,15 +15,16 @@
 #include "FeedClient.hpp"
 #include "product/ProductChangePublisherFactory.hpp"
 #include "TradeListener.hpp"
+#include "TradePublisher.hpp"
 
-class Market: public ProductSubscriber, ProductChangeListener, TradeListener{
+class Market: public ProductSubscriber, public ProductChangeListener, public TradeListener{
 public:
     Market(std::unique_ptr<FeedClient> feedClient, 
            std::unique_ptr<ProductChangePublisherFactory> publisherFactory);
     ~Market();
 
     void onProductChange(std::unique_ptr<ProductChange> pc) override;
-    void onTrade(std::unique_ptr<Trade> trade);
+    void onTrade(std::unique_ptr<Trade> trade) override;
     void processProductChanges();
     void subscribe(const std::string& clientId, const std::string& prodId) override;
     void unsubscribe(const std::string& clientId, const std::string& prodId) override;
@@ -42,4 +43,7 @@ private:
     std::condition_variable productChangeCv;
     std::atomic<bool> isRunning{true};
     std::thread m_productChangeHandlerThread;
+
+    std::mutex mutexTrades;
+    std::unordered_map<std::string, std::unique_ptr<TradePublisher>> m_trade_publishers;
 };

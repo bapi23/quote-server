@@ -77,9 +77,9 @@ Publisher profiling:
 Performance of serializing 100k of Orders 
 with protocol buffers:
 ```
-Publishing (creating json) took 8567 [µs]
-Publishing (dumping json) took 11654 [µs]
-Publishing (sending json) took 17 [µs]
+Publishing (creating proto) took 8567 [µs]
+Publishing (dumping proto) took 11654 [µs]
+Publishing (sending proto) took 17 [µs]
 ```
 with rapid json
 ```

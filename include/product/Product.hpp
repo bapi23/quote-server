@@ -36,21 +36,9 @@ void onProductChanges(std::vector<std::unique_ptr<ProductChange>> pcs) {
         }
     }
 
-    std::vector<std::unique_ptr<Trade>> trades;
-    for(auto& pc: pcs){
-        auto currentTrades = std::move(pc->getTrades());
-        trades.insert(trades.end(), 
-                      std::make_move_iterator(currentTrades.begin()), 
-                      std::make_move_iterator(currentTrades.end()));
-    }
-    if(!trades.empty()){
-        for(auto& trade: trades){
-            m_publisher->publish(std::move(trade));
-        }
-    }
     std::chrono::steady_clock::time_point orederbook = std::chrono::steady_clock::now();
     auto differenceOrderbook = std::chrono::duration_cast<std::chrono::microseconds>(orederbook - begin).count();
-    std::cout << "Updating Orderbook and trades " << differenceOrderbook << " [µs]" << std::endl;
+    std::cout << "Updating Orderbook took " << differenceOrderbook << " [µs]" << std::endl;
     
     if(bookUpdated){
         m_publisher->publish(m_orderBook.get());

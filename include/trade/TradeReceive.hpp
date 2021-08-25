@@ -5,24 +5,34 @@
 
 #include "Trade.hpp"
 #include "Message.pb.h"
+#include "Side.hpp"
 
+// {
+//     "type": "received",
+//     "time": "2014-11-07T08:19:27.028459Z",
+//     "product_id": "BTC-USD",
+//     "sequence": 10,
+//     "order_id": "d50ec984-77a8-460a-b958-66f114b0de9b",
+//     "size": "1.34",
+//     "price": "502.1",
+//     "side": "buy",
+//     "order_type": "limit"
+// }
 
-class TradeActivate: public Trade{
+class TradeReceive: public Trade{
 public:
-    TradeActivate(const std::string& orderId, 
-                    FloatingP size, 
-                    FloatingP price,
-                    FloatingP founds,
-                    FloatingP stopPrice,
-                    const std::string stopType,
-                    const std::string& productId):
+    TradeReceive(const std::string& orderId, 
+                  FloatingP size, 
+                  FloatingP price,
+                  Side side,
+                  const std::string orderType,
+                  const std::string& productId):
         Trade(productId),
         m_orderId(orderId),
         m_size(size),
+        m_side(side),
         m_price(price),
-        m_founds(founds),
-        m_stopPrice(stopPrice),
-        m_stopType(stopType)
+        m_orderType(orderType)
     {
     }
 
@@ -40,9 +50,7 @@ public:
         trade->set_product_id(getProductId());
         trade->set_size(m_size);
         trade->set_price(m_price);
-        trade->set_founds(m_founds);
-        trade->set_stop_price(m_stopPrice);
-        trade->set_stop_type(m_stopType);
+        trade->set_order_type(m_orderType);
 
         return pMessage.SerializeAsString();
     }
@@ -50,8 +58,7 @@ public:
     private:
     std::string m_orderId;
     FloatingP m_size;
+    Side m_side;
     FloatingP m_price;
-    FloatingP m_founds;
-    FloatingP m_stopPrice;
-    std::string m_stopType;
+    std::string m_orderType;
 };

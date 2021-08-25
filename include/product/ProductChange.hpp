@@ -5,7 +5,6 @@
 #include <unordered_map>
 #include <string>
 
-#include "trade/Trade.hpp"
 
 class OrderBook;
 
@@ -17,7 +16,6 @@ public:
     virtual std::string getProductId() const {return m_productId;}
     long unsigned getSequenceNumber() const {return m_sequenceNumber;}
     
-    virtual std::vector<std::unique_ptr<Trade>> getTrades() const = 0;
     virtual bool updateOrderBook(OrderBook* orderBook) const = 0;
     virtual ~ProductChange(){};
 

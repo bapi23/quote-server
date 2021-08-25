@@ -3,7 +3,6 @@
 #include "product/Product.hpp"
 #include "Side.hpp"
 
-#include "trade/TradeChange.hpp"
 
 class ProductChangeChange: public ProductChange{
 public:
@@ -28,12 +27,6 @@ public:
                 m_remainingSize(remainingSize),
                 m_side(side)
     {
-    }
-
-    std::vector<std::unique_ptr<Trade>> getTrades() const override{
-        std::vector<std::unique_ptr<Trade>> out;
-        out.push_back(std::make_unique<TradeChange>(m_orderId, m_remainingSize, getProductId()));
-        return out;
     }
 
     bool updateOrderBook(OrderBook* orderBook) const override{

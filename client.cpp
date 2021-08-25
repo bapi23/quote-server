@@ -45,6 +45,22 @@ std::queue<ScenarioEntry> scenario;
 
 boost::circular_buffer<std::chrono::steady_clock::time_point> stamps(100);
 
+std::string tradeToString(qs::TradeType type){
+    switch(type){
+        case qs::TradeType_ACTIVATE:
+            return "ACTIVATE";
+        case qs::TradeType_CHANGE:
+            return "CHANGE";
+        case qs::TradeType_DONE:
+            return "CHANGE";
+        case qs::TradeType_MATCH:
+            return "MATCH";
+        case qs::TradeType_OPEN:
+            return "OPEN";
+    }
+}
+
+
 void handleFeedMessages(){
     std::chrono::steady_clock::time_point lastTime;
     while(true){
@@ -65,7 +81,7 @@ void handleFeedMessages(){
             if(pMessage.message_type() == qs::MessageType_ORDERBOOK){
                  std::cout << "["<< pMessage.order_book().product_id() << "] " << "Received new orderbook message" << std::endl;
             } else if(pMessage.message_type() == qs::MessageType_TRADE){
-                std::cout << "["<< pMessage.trade().product_id() << "] " << " Received new trade message of type: " << pMessage.trade().type() << std::endl;
+                std::cout << "["<< pMessage.trade().product_id() << "] " << " Received new trade message of type: " << tradeToString(pMessage.trade().type()) << std::endl;
             }
         }
     }
@@ -247,6 +263,7 @@ int main(int argc, char **argv){
                     std::unique_lock<std::mutex> lk(mutexEndpoints);
                     std::cout << "Received subscribe confirmation message!"<< std::endl;
                     endpointsToSubscribe.push(jmsg["product_endpoint"]);
+                    endpointsToSubscribe.push(jmsg["trade_endpoint"]);
                     std::cout << endpointsToSubscribe.size();
                 }
                 cvEndpoints.notify_one();
@@ -255,6 +272,7 @@ int main(int argc, char **argv){
                 {
                     std::unique_lock<std::mutex> lk(mutexEndpoints);
                     endpointsToUnsubscribe.push(jmsg["product_endpoint"]);
+                    endpointsToUnsubscribe.push(jmsg["trade_endpoint"]);
                 }
                 cvEndpoints.notify_one();
             } else if (jmsg["type"] == "heartbeat"){

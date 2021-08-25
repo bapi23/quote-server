@@ -15,10 +15,6 @@ public:
     {
     }
 
-    std::vector<std::unique_ptr<Trade>> getTrades() const override{
-        return std::vector<std::unique_ptr<Trade>>();
-    }
-
     bool updateOrderBook(OrderBook* orderBook) const override{
         std::cout << "Reinitializing orderbook with " << m_bids.size() << " bids, "
                                                       << m_asks.size() << " asks and "

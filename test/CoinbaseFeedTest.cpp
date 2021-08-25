@@ -9,6 +9,7 @@
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "RestTransport.hpp"
 #include "OrderBook.hpp"
+#include "TradeListener.hpp"
 
 using namespace std::chrono_literals;
 
@@ -48,6 +49,16 @@ class ProductListener: public ProductChangeListener{
 };
 
 
+class TradeListenerSpy: public TradeListener{
+  public:
+    virtual void onTrade(std::unique_ptr<Trade> trade) override {
+      trades.push_back(std::move(trade));
+    }
+
+    std::vector<std::unique_ptr<Trade>> trades;
+};
+
+
 TEST_CASE("DoneMessageReceivedShouldAdd", "CoibaseFeedTest") {
     std::string clientId = "1";
     std::string prodId = "ETH-USD";
@@ -57,8 +68,10 @@ TEST_CASE("DoneMessageReceivedShouldAdd", "CoibaseFeedTest") {
     RestTransport::asks.push_back(Order{1.1, 100, "OrderNb2"});
     RestTransport::request_time_in_ms = 0;
     ProductListener listener;
+    TradeListenerSpy tradeListener;
     {
       CoinbaseFeedClient client;
+      client.setTradeListener(&tradeListener);
       client.subscribe(prodId, &listener);
       auto start = std::chrono::high_resolution_clock::now();
       std::this_thread::sleep_for(100ms);
@@ -86,8 +99,10 @@ TEST_CASE("DoneMessageReceivedShouldAddAsMerged", "CoibaseFeedTest") {
     RestTransport::request_time_in_ms = 2000;
     RestTransport::sequence = 1;
     ProductListener listener;
+    TradeListenerSpy tradeListener;
     {
       CoinbaseFeedClient client;
+      client.setTradeListener(&tradeListener);
       client.subscribe(prodId, &listener);
       std::this_thread::sleep_for(100ms);
 

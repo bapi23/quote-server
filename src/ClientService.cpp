@@ -93,7 +93,8 @@ void ClientService::runImpl(){
                                 {"type", "subscribe_request"},
                                 {"client_id", clientId},
                                 {"product_id", productId},
-                                {"product_endpoint", "tcp://" + m_endpoint_address + ":" + transport::prodIdToPort[productId]}
+                                {"product_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].orderbookPort},
+                                {"trade_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].tradePort}
                                 // TODO send full list of subscription
                             };
                         data = jmessage.dump();
@@ -144,7 +145,8 @@ void ClientService::runImpl(){
                                 {"type", "unsubscribe_request"},
                                 {"client_id", clientId},
                                 {"product_id", productId},
-                                {"product_endpoint", "tcp://" + m_endpoint_address + ":" + transport::prodIdToPort[productId]}
+                                {"product_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].orderbookPort},
+                                {"trade_endpoint", "tcp://" + transport::prodIdToPort[productId].address + ":" + transport::prodIdToPort[productId].tradePort}
                                 // TODO send full list of subscription
                             };
                         data = jmessage.dump();

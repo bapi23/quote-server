@@ -9,6 +9,7 @@
 #include "coinbase/CoinbaseFeedClient.hpp"
 #include "RestTransport.hpp"
 #include "OrderBook.hpp"
+#include "TradeListener.hpp"
 
 using namespace std::chrono_literals;
 
@@ -19,6 +20,15 @@ class ProductListener: public ProductChangeListener{
     }
 
     std::vector<std::unique_ptr<ProductChange>> productChanges;
+};
+
+class TradeListenerSpy: public TradeListener{
+  public:
+    virtual void onTrade(std::unique_ptr<Trade> trade) override {
+      trades.push_back(std::move(trade));
+    }
+
+    std::vector<std::unique_ptr<Trade>> trades;
 };
 
 struct Result{
@@ -65,9 +75,11 @@ TEST_CASE("MatchOrderbookWithRESTRequest", "ProductionCoinbaseFeedTest") {
     std::string prodId = "ETH-BTC";
     
     ProductListener listener;
+    TradeListenerSpy tradeListener;
     std::thread orderBookThread(&requestInLoop);
     {
       CoinbaseFeedClient client;
+      client.setTradeListener(&tradeListener);
       client.subscribe(prodId, &listener);
       std::this_thread::sleep_for(5000ms);
     }

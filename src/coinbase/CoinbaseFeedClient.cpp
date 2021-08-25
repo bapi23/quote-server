@@ -9,7 +9,8 @@
 #include "FeedClient.hpp"
 #include "coinbase/CoinbaseFeedProduct.hpp"
 #include "coinbase/CoinbaseFeedClient.hpp"
-
+#include "TradeListener.hpp"
+#include "coinbase/MessageToTrade.hpp"
 namespace {
 
 auto subscribe_template = json::parse(R"({
@@ -28,6 +29,35 @@ auto unsibscribe_template = json::parse(R"({
     "channels": ["ticker", "full", "heartbeat"]
 })");
 
+bool isTradeMsg(const nlohmann::json& msg){
+    if(!msg.contains("type")){
+        return false;
+    } else {
+        if(msg["type"] == "activate" ||
+           msg["type"] == "receive" ||
+           msg["type"] == "match") {
+               return true;
+           } else {
+               return false;
+           }
+    }
+}
+
+bool isProductChangeMsg(const nlohmann::json msg){
+    if(!msg.contains("type")){
+        return false;
+    } else {
+        if(msg["type"] == "change" ||
+           msg["type"] == "done" ||
+           msg["type"] == "open" ||
+           msg["type"] == "match" ) {
+               return true;
+           } else {
+               return false;
+           }
+    }
+}
+
 }
 
 CoinbaseFeedClient::CoinbaseFeedClient(): m_stamps(2000){}
@@ -35,6 +65,11 @@ CoinbaseFeedClient::CoinbaseFeedClient(): m_stamps(2000){}
 CoinbaseFeedClient::~CoinbaseFeedClient(){
     feedTransport.unsubscribe("coinbaseFeed");
 }
+
+void CoinbaseFeedClient::setTradeListener(TradeListener* listener){
+    tradeListener = listener;
+}
+
 
 void CoinbaseFeedClient::onMessageReceived(const std::string& message){
     std::lock_guard<std::mutex> lg(mutexFeedData);
@@ -57,7 +92,7 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
             //send metrics
         }
 
-        if(jmsg.contains("product_id")){
+        if(jmsg.contains("sequence")){
             auto prodId = jmsg["product_id"].get<std::string>();
             auto it = prodIdToListener.find(prodId);
             if(it == prodIdToListener.end()){
@@ -65,9 +100,16 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
             } else {
                 it->second->onMessageReceived(jmsg);
             }
-        } else if(jmsg["type"] == "subscriptions"){
+        }
+        if(isTradeMsg(jmsg)){
+            if(tradeListener){
+                tradeListener->onTrade(MessageToTrade::getTrade(jmsg));
+            }
+        }
+        if(jmsg["type"] == "subscriptions"){
             std::cout << "Received subscribe message" << jmsg << std::endl;
-        } else if(jmsg["type"] == "unsubscribe"){
+        }
+        if(jmsg["type"] == "unsubscribe"){
             std::cout << "Received unsubscribe message" << jmsg << std::endl;
         }
 

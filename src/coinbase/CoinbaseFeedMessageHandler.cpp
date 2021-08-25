@@ -10,7 +10,6 @@
 #include "product/ProductChangeDone.hpp"
 #include "product/ProductChangeMatch.hpp"
 #include "product/ProductChangeChange.hpp"
-#include "product/ProductChangeActivate.hpp"
 #include "MessageReceiver.hpp"
 #include "Order.hpp"
 
@@ -66,34 +65,6 @@ std::unique_ptr<ProductChange> CoinbaseFeedMessageHandler::getProductChange(cons
             const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
             pc = std::make_unique<ProductChangeOpen>(orderId, std::stod(price), std::stod(size), side, m_productId, sequence);
-        }
-        if(jmsg["type"].get<std::string>() == "activate"){
-
-            // {
-            // "type": "activate",
-            // "product_id": "test-product",
-            // "timestamp": "1483736448.299000",
-            // "user_id": "12",
-            // "profile_id": "30000727-d308-cf50-7b1c-c06deb1934fc",
-            // "order_id": "7b52009b-64fd-0a2a-49e6-d8a939753077",
-            // "stop_type": "entry",
-            // "side": "buy",
-            // "stop_price": "80",
-            // "size": "2",
-            // "funds": "50",
-            // "private": true
-            // }
-
-            const std::string orderId = jmsg["order_id"].get<std::string>();
-            long unsigned sequence = jmsg["sequence"].get<long unsigned>();
-            const std::string price = jmsg["price"].get<std::string>();
-            const std::string size = jmsg["size"].get<std::string>();
-            const std::string stop_type = jmsg["stop_type"].get<std::string>();
-            const std::string stop_price = jmsg["stop_price"].get<std::string>();
-            const std::string founds = jmsg["founds"].get<std::string>();
-            const Side side = jmsg["side"].get<std::string>() == "sell"? Side::Sell: Side::Buy;
-            //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << orderId << std::endl;
-            pc = std::make_unique<ProductChangeActivate>(orderId, std::stod(price), std::stod(size), side, std::stod(founds), std::stod(stop_price), stop_type, m_productId, sequence);
         } else if (jmsg["type"].get<std::string>() == "done") {
             //std::cout << "[FEED]:" << jmsg["type"].get<std::string>() << " id: " << jmsg["order_id"].get<std::string>() << std::endl;
             const std::string orderId = jmsg["order_id"].get<std::string>();

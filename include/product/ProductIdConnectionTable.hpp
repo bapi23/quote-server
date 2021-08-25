@@ -2,5 +2,11 @@
 #include <unordered_map>
 
 namespace transport{
-    extern std::unordered_map<std::string, std::string> prodIdToPort;
+    struct Endpoint{
+        std::string address;
+        std::string orderbookPort;
+        std::string tradePort;
+    };
+    
+    extern std::unordered_map<std::string, Endpoint> prodIdToPort;
 }

@@ -21,6 +21,7 @@ set(SOURCE
     src/coinbase/CoinbaseFeedMessageHandler.cpp
     src/coinbase/CoinbaseFeedProduct.cpp
     src/coinbase/CoinbaseFeedClient.cpp
+    src/coinbase/MessageToTrade.cpp
     transport/src/RestTransport.cpp
     transport/src/WebsocketTransport.cpp
     src/utils/uuid.cpp

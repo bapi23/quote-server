@@ -118,9 +118,12 @@
 
 int main(int argc, char* argv[]) {
     using namespace std::chrono_literals;
+    TradeListener* tradeListener;
     auto feed = std::make_unique<CoinbaseFeedClient>();
+    auto feedPtr = feed.get();
     std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
     std::unique_ptr<Market> market = std::make_unique<Market>(std::move(feed), std::move(publisherFactory));
+    feedPtr->setTradeListener(market.get());
     ClientService clientReg(market.get(), "127.0.0.1");
     clientReg.run();
     bool done = false;
