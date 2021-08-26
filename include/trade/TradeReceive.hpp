@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <optional>
 
 #include "utils/FloatingP.hpp"
 
@@ -22,13 +23,17 @@
 class TradeReceive: public Trade{
 public:
     TradeReceive(const std::string& orderId, 
-                  FloatingP size, 
+                  std::optional<FloatingP> size, 
+                  std::optional<FloatingP> founds, 
+                  std::optional<FloatingP> price, 
                   Side side,
                   const std::string orderType,
                   const std::string& productId):
         Trade(productId),
         m_orderId(orderId),
+        m_founds(founds),
         m_size(size),
+        m_price(price),
         m_side(side),
         m_orderType(orderType)
     {
@@ -46,7 +51,15 @@ public:
         trade->set_type(qs::TradeType_ACTIVATE);
         trade->set_order_id(m_orderId);
         trade->set_product_id(getProductId());
-        trade->set_size(m_size);
+        if(m_size){
+            trade->set_size(*m_size);
+        }
+        if(m_price){
+            trade->set_price(*m_price);
+        }
+        if(m_price){
+            trade->set_founds(*m_founds);
+        }
         trade->set_order_type(m_orderType);
 
         return pMessage.SerializeAsString();
@@ -54,7 +67,9 @@ public:
 
     private:
     std::string m_orderId;
-    FloatingP m_size;
+    std::optional<FloatingP> m_size;
+    std::optional<FloatingP> m_price;
+    std::optional<FloatingP> m_founds;
     Side m_side;
     std::string m_orderType;
 };

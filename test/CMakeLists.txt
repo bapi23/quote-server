@@ -9,7 +9,6 @@ set(SOURCE
     ${PROJECT_SOURCE_DIR}/src/Order.cpp
     ${PROJECT_SOURCE_DIR}/src/Market.cpp
     ${PROJECT_SOURCE_DIR}/src/OrderBook.cpp
-    ${PROJECT_SOURCE_DIR}/src/product/ProductIdConnectionTable.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedProduct.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/CoinbaseFeedClient.cpp
     ${PROJECT_SOURCE_DIR}/src/coinbase/MessageToTrade.cpp

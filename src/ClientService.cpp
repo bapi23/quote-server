@@ -7,7 +7,7 @@
 
 #include "ClientService.hpp"
 #include "utils/uuid.hpp"
-#include "product/ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 #include "product/ProductSubscriber.hpp"
 
 ClientService::ClientService(ProductSubscriber* productSubscriber, const std::string& endpoint_address):

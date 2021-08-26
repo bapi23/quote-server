@@ -6,7 +6,7 @@
 #include <nlohmann/json.hpp>
 #include <memory>
 
-#include "ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 #include "OrderBookView.hpp"
 
 class ProductChangePublisher

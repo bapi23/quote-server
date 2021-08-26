@@ -8,7 +8,7 @@
 #include <atomic>
 
 #include "utils/uuid.hpp"
-#include "product/ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 #include "product/ProductSubscriber.hpp"
 
 class ClientService{

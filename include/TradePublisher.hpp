@@ -8,7 +8,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "ZMQPublisher.hpp"
-#include "product/ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 #include "product/ProductChangePublisher.hpp"
 
 #include "rapidjson/document.h"

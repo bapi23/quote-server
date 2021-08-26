@@ -88,10 +88,10 @@ TEST_CASE("MatchOrderbookWithRESTRequest", "ProductionCoinbaseFeedTest") {
     requestOrderBook = false;
     orderBookThread.join();
 
-    OrderBook book;
+    OrderBook qsBook;
 
       for(auto& productChange: listener.productChanges){
-        productChange->updateOrderBook(&book);
+        productChange->updateOrderBook(&qsBook);
         auto pcSeq = productChange->getSequenceNumber();
 
         for(const auto& fullBook: fullOrderbookRequests){
@@ -101,15 +101,7 @@ TEST_CASE("MatchOrderbookWithRESTRequest", "ProductionCoinbaseFeedTest") {
             std::vector<std::string> realIds;
             std::vector<std::string> bookIds;
 
-            REQUIRE(book.getAsks().size() == fullBook.asks.size());
-            for(const auto& ask: book.getAsks()){
-              bookIds.push_back(ask.order_id);
-            }
-            for(const auto& ask: fullBook.asks){
-              realIds.push_back(ask.order_id);
-            }
-            std::sort(std::begin(realIds),std::end(realIds));
-            std::sort(std::begin(bookIds), std::end(bookIds));
+            REQUIRE(qsBook.getAsks().size() == fullBook.asks.size());
           }
         }
     }

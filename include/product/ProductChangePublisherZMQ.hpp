@@ -8,7 +8,7 @@
 #include <boost/numeric/conversion/cast.hpp>
 
 #include "ZMQPublisher.hpp"
-#include "ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 #include "product/ProductChangePublisher.hpp"
 
 #include "rapidjson/document.h"
@@ -122,7 +122,7 @@ public:
 
         std::chrono::steady_clock::time_point creating = std::chrono::steady_clock::now();
         auto differenceCreating = std::chrono::duration_cast<std::chrono::microseconds>(creating - begin).count();
-        std::cout << "Publishing (creating data) took " << differenceCreating << " [µs]" << std::endl;
+        std::cout << "Publishing Orderbook for " << m_productId << " (creating data) took " << differenceCreating << " [µs]" << std::endl;
 
 #ifdef RAPID_JSON_PUB
         rapidjson::StringBuffer strbuf;
@@ -137,13 +137,13 @@ public:
 
         std::chrono::steady_clock::time_point dumping = std::chrono::steady_clock::now();
         auto differenceDumping = std::chrono::duration_cast<std::chrono::microseconds>(dumping - begin).count();
-        std::cout << "Publishing (dumping data) took " << differenceDumping << " [µs]" << std::endl;
+        std::cout << "Publishing Orderbook for " << m_productId << " (dumping data) took " << differenceDumping << " [µs]" << std::endl;
 
         m_publisher.publish(payload);
 
         std::chrono::steady_clock::time_point sending = std::chrono::steady_clock::now();
         auto differenceSending = std::chrono::duration_cast<std::chrono::microseconds>(sending - dumping).count();
-        std::cout << "Publishing (sending data) took " << differenceSending << " [µs]" << std::endl;
+        std::cout << "Publishing Orderbook for " << m_productId << " (sending data) took " << differenceSending << " [µs]" << std::endl;
     }
 
     std::string m_productId;

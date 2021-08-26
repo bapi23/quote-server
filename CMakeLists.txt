@@ -17,7 +17,6 @@ set(SOURCE
     src/Order.cpp
     src/Market.cpp
     src/OrderBook.cpp
-    src/product/ProductIdConnectionTable.cpp
     src/coinbase/CoinbaseFeedMessageHandler.cpp
     src/coinbase/CoinbaseFeedProduct.cpp
     src/coinbase/CoinbaseFeedClient.cpp

@@ -2,7 +2,7 @@
 #include <iostream>
 
 #include <zmq_addon.hpp>
-#include "product/ProductIdConnectionTable.hpp"
+#include "CoinbaseEndpointService.hpp"
 
 class ZMQPublisher{
 public:
