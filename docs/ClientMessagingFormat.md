@@ -1,4 +1,5 @@
 ## Client related information
+CientService uses REQUEST/RESPONSE pattern. Currently endpoint is set to 127.0.0.1:10090
 
 ##### Client registration
 Client needs to get clientId to be able to subscribe and receive OrderBook and Trade messages
@@ -70,3 +71,6 @@ Response:
 ##### Other messages
 
 Server can send also heartbeat message if there is longer period when no message will be transmitted. Client should response with the same message or any other to ensure server that there is a connection.
+
+TODO:
+- Make endpoint address (with port) configurable

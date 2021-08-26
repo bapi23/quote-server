@@ -73,5 +73,6 @@
         "bit": "cpp",
         "shared_mutex": "cpp",
         "hash_set": "cpp"
-    }
+    },
+    "cmake.configureOnOpen": false
 }

@@ -1,6 +1,12 @@
 ## QS Server design
 
-### Transport side
+Server is dividen into 4 parts:
+1. FeedClient which should provide feed messages for the rest of the system
+2. Market (business logic) responsible for synchronization between productIds and clients
+3. ClientService responsible for registering and subscibing clients
+4. Publishing services implementing publish subscribe pattern for streaming orderbook updates and trade messages
+
+### FeedClient side
 
 ##### Coinbase FeedClient sequence diagram
 WebsocketTransport feed message reception by MessageReceiver interface. It shows example of implementation for Coinbase
@@ -46,11 +52,12 @@ FeedClient <|-- CoinbaseFeedClient
 CoinbaseFeedClient "1" *-- "1" TradeListener
 CoinbaseFeedProduct "1" *-- "1" CoinbaseFeedMessageHandler : contains
 CoinbaseFeedProduct "1" *-- "1" ProductListener : contains
+MessageReceiver <|-- CoinbaseFeedClient
 @enduml
 ```
 
 
-##### Top level Market class diagram
+##### Market class diagram
 Simple top level class diagram which shows compositions of the main domain parts
 ```plantuml
 @startuml "Market class diagram"
@@ -60,25 +67,40 @@ class Market
 class Product
 class Client
 abstract FeedClient
-abstract OrderBook
+class OrderBook
 abstract ProductChangeListener
 
 Market "1" o-- "*" Client
+Market "1" o-- "*" Product
 Product "1" o-- "*" Client
 Market "1" o-- "1" FeedClient
+ProductSubscriber <|-- Market
 Product "1" o-- "1" OrderBook
-ProductChangeListener <|-- Product
+ProductChangeListener <|-- Market
+TradeListener <|-- Market
+
 @enduml
 ```
 
-##### Sequence diagram after creating ProductChange:
+##### Publisher part:
 Classes wchich implements ProductChange interface encapsulates logic related to specifig changes. New ProductChange might be added and FeedClient interface implementation can create it. In Coinbase use case CoinbaseFeedMessageHandler class creates concrete ProductChange's
 
+Product changed:
 ```plantuml
 @startuml "ProductChangeReceived"
-CoinbaseFeedMessageHandler->Product: onProductChange(productChange)
+CoinbaseFeedMessageHandler->Market: onProductChange(productChange)
+Market->Product: onProductChanges(productChanges[])
 Product->ProductChange : updateOrderBook(OrderBook): (updated) bool
 Product->ProductChangePublisher: if(updated): publish(OrderBookView)
+@enduml
+```
+
+Trade received:
+```plantuml
+@startuml "ProductChangeReceived"
+CoinbaseFeed->Market: onTrade(trade)
+Market->TradePublisher: publish(trade)
+TradePublisher->ZMQPulisher : publish(serializedTrade)
 @enduml
 ```
 
