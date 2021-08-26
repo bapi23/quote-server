@@ -13,7 +13,8 @@ RUN apt-get update \
         openssh-client \
         ca-certificates \
         libprotobuf-dev \
-        protobuf-compiler
+        protobuf-compiler \
+        rapidjson-dev
 
 RUN git clone https://github.com/zeromq/libzmq.git && \
     cd libzmq && git checkout v4.3.0 && \
@@ -30,7 +31,6 @@ WORKDIR /app/src/qs_server/
 
 RUN mkdir build && cd build  \
     && cmake -DCMAKE_BUILD_TYPE=Release .. \
-    && cmake --build . -- -j4; \
-    fi
+    && make -j 
 
 CMD /app/src/qs_server/build/qs_server

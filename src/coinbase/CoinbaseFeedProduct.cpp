@@ -41,11 +41,11 @@ void CoinbaseFeedProduct::onMessageReceived(const nlohmann::json& message) {
         return;
     }
     if( sequence > m_lastSequenceNumber + 1){
-        //std::cout << "[" << m_productId << "]" << "Received gap between message" << m_lastSequenceNumber << " vs " << sequence << std::endl;
+        std::cout << "[" << m_productId << "]" << "Received gap between messages" << m_lastSequenceNumber << " vs " << sequence << std::endl;
         m_lastSequenceNumber = 0;
         requestFullOrderBook();
     } else if (sequence <= m_lastSequenceNumber){
-        //std::cout << "[" << m_productId << "]" << "Received too old message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
+        std::cout << "[" << m_productId << "]" << "Received too old message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;
         return;
     } else {
         //std::cout << "[" << m_productId << "]" << "Received up-to-date message: " << sequence << " Last one:" << m_lastSequenceNumber << std::endl;

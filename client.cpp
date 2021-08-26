@@ -79,7 +79,7 @@ void handleFeedMessages(){
             qs::qsMessage pMessage;
             pMessage.ParseFromString(message);
             if(pMessage.message_type() == qs::MessageType_ORDERBOOK){
-                 std::cout << "["<< pMessage.order_book().product_id() << "] " << "Received new orderbook message" << std::endl;
+                 std::cout << "["<< pMessage.order_book().product_id() << "] " << "Received new ORDERBOOK message" << std::endl;
             } else if(pMessage.message_type() == qs::MessageType_TRADE){
                 std::cout << "["<< pMessage.trade().product_id() << "] " << " Received new trade message of type: " << tradeToString(pMessage.trade().type()) << std::endl;
             }

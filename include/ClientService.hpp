@@ -20,7 +20,7 @@ private:
     void runImpl();
 
     std::atomic<bool> isRunning{true};
-    std::unordered_set<std::string> registeredClientIds;
+    std::unordered_set<std::string> m_registeredClientIds;
     ProductSubscriber* m_productSubscriber;
     std::string m_endpoint_address;
 };

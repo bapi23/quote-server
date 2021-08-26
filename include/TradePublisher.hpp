@@ -29,6 +29,7 @@ public:
         }
 
     void publish(std::unique_ptr<Trade> trade){
+        std::cout << "Publishing Trade message for " << trade->getProductId() << std::endl;
         std::string payload = trade->generateMessage();
 
         m_publisher.publish(payload);

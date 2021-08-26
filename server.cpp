@@ -115,25 +115,45 @@
 #include "product/ProductChangePublisherFactoryZMQ.hpp"
 #include <chrono>
 #include <thread>
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
 
 int main(int argc, char* argv[]) {
     using namespace std::chrono_literals;
+
+    po::variables_map vm;
+    std::string bindAddress;
+
+    po::options_description desc("Client");
+    desc.add_options()("help", "help msg");
+    desc.add_options()("bind-address", po::value<std::string>(), "Bind server endpoint in format <ip-address>:<port> for example --bind-address 0.0.0.0:10090");
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
+        return 0;
+    }
+
+    if (vm.count("bind-address")) {
+        bindAddress = vm["bind-address"].as<std::string>();
+    } else {
+        std::cout << "Please provide bind-address" << std::endl;
+        return 1;
+    }
+
+
     TradeListener* tradeListener;
     auto feed = std::make_unique<CoinbaseFeedClient>();
     auto feedPtr = feed.get();
     std::unique_ptr<ProductChangePublisherFactory> publisherFactory = std::make_unique<ProductChangePublisherFactoryZMQ>();
     std::unique_ptr<Market> market = std::make_unique<Market>(std::move(feed), std::move(publisherFactory));
     feedPtr->setTradeListener(market.get());
-    ClientService clientReg(market.get(), "127.0.0.1");
-    clientReg.run();
+    ClientService clientService(market.get(), bindAddress);
+    clientService.run();
     bool done = false;
 
-    // auto response = RestTransport::request("https://api.pro.coinbase.com/products/ETH-BTC/book?level=3");
-    // WebsocketTransport transport;
-    // transport.connect("wss://ws-feed.pro.coinbase.com");
-    // sleep(1);
-    // transport.send(subscribe_test.dump());
-    //market.subscribe("clientId1", "ETH-USD");
     while(!done){
         std::this_thread::sleep_for(20ms);
     }

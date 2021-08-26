@@ -63,16 +63,16 @@ bool isProductChangeMsg(const nlohmann::json msg){
 CoinbaseFeedClient::CoinbaseFeedClient(): m_stamps(2000){}
 
 CoinbaseFeedClient::~CoinbaseFeedClient(){
-    feedTransport.unsubscribe("coinbaseFeed");
+    m_feedTransport.unsubscribe("coinbaseFeed");
 }
 
 void CoinbaseFeedClient::setTradeListener(TradeListener* listener){
-    tradeListener = listener;
+    m_tradeListener = listener;
 }
 
 
 void CoinbaseFeedClient::onMessageReceived(const std::string& message){
-    std::lock_guard<std::mutex> lg(mutexFeedData);
+    std::lock_guard<std::mutex> lg(m_mutexFeedData);
     try{
         auto jmsg = json::parse(message);
         if(!jmsg.contains("type")){
@@ -94,16 +94,16 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
 
         if(jmsg.contains("sequence")){
             auto prodId = jmsg["product_id"].get<std::string>();
-            auto it = prodIdToListener.find(prodId);
-            if(it == prodIdToListener.end()){
+            auto it = m_prodIdToListener.find(prodId);
+            if(it == m_prodIdToListener.end()){
                 //std::cout << "Got product id which was not subscribed to!" << std::endl;
             } else {
                 it->second->onMessageReceived(jmsg);
             }
         }
         if(isTradeMsg(jmsg)){
-            if(tradeListener){
-                tradeListener->onTrade(MessageToTrade::getTrade(jmsg));
+            if(m_tradeListener){
+                m_tradeListener->onTrade(MessageToTrade::getTrade(jmsg));
             }
         }
         if(jmsg["type"] == "subscriptions"){
@@ -120,31 +120,31 @@ void CoinbaseFeedClient::onMessageReceived(const std::string& message){
 }
 
 void CoinbaseFeedClient::subscribe(const std::string& productId, ProductChangeListener* listener) {
-    std::lock_guard<std::mutex> lg(mutexFeedData);
+    std::lock_guard<std::mutex> lg(m_mutexFeedData);
     {
         if(!m_connected){
-            feedTransport.subscribe("coinbaseFeed", this);
-            feedTransport.connect("wss://ws-feed.pro.coinbase.com");
+            m_feedTransport.subscribe("coinbaseFeed", this);
+            m_feedTransport.connect("wss://ws-feed.pro.coinbase.com");
             m_connected = true;
             
         }
-        auto it = prodIdToListener.find(productId);
-        if(it == prodIdToListener.end()){
-            prodIdToListener.emplace(
+        auto it = m_prodIdToListener.find(productId);
+        if(it == m_prodIdToListener.end()){
+            m_prodIdToListener.emplace(
                 std::make_pair(productId, std::make_unique<CoinbaseFeedProduct>(productId, listener)));
         } else {
             std::cout << "listener already registered";
         }
         std::cout << "Registering listener for prod id: " << productId << std::endl;
     }
-    feedTransport.send(generateSubscribeMessage(productId));
+    m_feedTransport.send(generateSubscribeMessage(productId));
 }
 
 void CoinbaseFeedClient::unsubscribe(const std::string& productId) {
     std::cout << "Unsubscribed " << productId << std::endl;
-    feedTransport.send(generateUnsubscribeMessage(productId));
-    std::lock_guard<std::mutex> lg(mutexFeedData);
-    prodIdToListener.erase(productId);
+    m_feedTransport.send(generateUnsubscribeMessage(productId));
+    std::lock_guard<std::mutex> lg(m_mutexFeedData);
+    m_prodIdToListener.erase(productId);
 }
 
 std::string CoinbaseFeedClient::generateSubscribeMessage(const std::string& productId){

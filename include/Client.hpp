@@ -14,5 +14,5 @@ public:
     }
 private:
     std::string m_clientId;
-    std::vector<std::string> orderIds;
+    std::vector<std::string> m_orderIds;
 };

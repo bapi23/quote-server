@@ -5,7 +5,7 @@ services:
         image: "qs_server"
         container_name: qs_server
         network_mode: host
-        command: bash -c "/app/src/qs_server/build/qs_server"
+        command: bash -c "/app/src/qs_server/build/qs_server --bind-address 0.0.0.0:10090"
 
     client:
         image: "qs_server"

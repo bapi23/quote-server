@@ -23,7 +23,7 @@ void ClientService::run(){
 void ClientService::runImpl(){
     zmq::context_t ctx;
     zmq::socket_t sock(ctx, zmq::socket_type::rep);
-    sock.bind("tcp://*:10090");
+    sock.bind("tcp://" + m_endpoint_address);
     while(isRunning){         
         zmq::message_t message;
         //std::cout << "Waiting for the message" << std::endl;
@@ -47,8 +47,8 @@ void ClientService::runImpl(){
                     memcpy (message.data(), data.data(), data.size());
                     sock.send(message, zmq::send_flags::none);
                     std::cout << "Sent client id request response" << std::endl;
-                    registeredClientIds.insert(clientId);
-                    std::cout << "Registered already " << registeredClientIds.size() << " clients" << std::endl;
+                    m_registeredClientIds.insert(clientId);
+                    std::cout << "Registered already " << m_registeredClientIds.size() << " clients" << std::endl;
 
                 } else if (jmsg["type"] =="subscribe_request"){
                     std::cout << "Received subscribe_request" << std::endl;
@@ -67,7 +67,7 @@ void ClientService::runImpl(){
 
                     const std::string clientId = jmsg["client_id"];
                     const std::string productId = jmsg["product_id"];
-                    if(registeredClientIds.count(clientId) == 0){
+                    if(m_registeredClientIds.count(clientId) == 0){
                         std::cout << "Invalid subscribe_request server don't know the client id: " << clientId << std::endl;
                         error = "UnknownClientId";
                     }
@@ -87,7 +87,7 @@ void ClientService::runImpl(){
                         data = jmessage.dump();
                     } else {
                         m_productSubscriber->subscribe(clientId, productId);
-                        registeredClientIds.insert(clientId);
+                        m_registeredClientIds.insert(clientId);
 
                         nlohmann::json jmessage = {
                                 {"type", "subscribe_request"},
@@ -118,7 +118,7 @@ void ClientService::runImpl(){
 
                     const std::string clientId = jmsg["client_id"];
                     const std::string productId = jmsg["product_id"];
-                    if(registeredClientIds.count(clientId) == 0){
+                    if(m_registeredClientIds.count(clientId) == 0){
                         std::cout << "Invalid unsubscribe_request server don't know the client id: " << clientId << std::endl;
                         error = "UnknownClientId";
                     }
@@ -164,7 +164,7 @@ void ClientService::runImpl(){
                     }
 
                     const std::string clientId = jmsg["client_id"];
-                    if(registeredClientIds.count(clientId) == 0){
+                    if(m_registeredClientIds.count(clientId) == 0){
                         std::cout << "Invalid subscribe_request server don't know the client id: " << clientId << std::endl;
                         error = "UnknownClientId";
                     }
