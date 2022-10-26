@@ -1,4 +1,4 @@
-#QS Server implementation
+# Simple Quota Server implementation
 
 QS Server can be used mainly to obtain data from the Coinbase pro api. It might be also extended with other APIs
 The main purpose of the project is to obtain feed data in fast and reliable way.
